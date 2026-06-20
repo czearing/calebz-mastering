@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+/*
+  Single token source. No raw values in components.
+  See plan/04-design-system.md. Dark theme only.
+*/
+
+:root {
+  /* Color */
+  --bg: #060708;
+  --surface: #0e1113;
+  --line: #1c2227;
+  --text: #f4f6f7;
+  --muted: #8a9499;
+  --cyan: #00e5ff;
+  --cyan-dim: #0a8c9c;
+  /* Semantic error. Warm red tuned to pass WCAG AA on --bg (#060708):
+     contrast ratio about 7.3:1, so validation copy reads as an error, not
+     as cyan helper text. Used only for form validation messages. */
+  --error: #ff6b6b;
+
+  /* Spacing, 8px base scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+  --space-11: 160px;
+  --space-12: 224px;
+
+  /* Radius and border */
+  --radius-sm: 2px;
+  --radius-md: 8px;
+  --border-line: 1px;
+
+  /* Layout */
+  --max-content: 1200px;
+  --max-reading: 64ch;
+}
+
+/* Expose tokens to Tailwind v4 utilities */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-cyan: var(--cyan);
+  --color-cyan-dim: var(--cyan-dim);
+  --color-error: var(--error);
+
+  --font-sans: var(--font-display), system-ui, sans-serif;
+  --font-mono: var(--font-mono-label), ui-monospace, monospace;
+
+  --radius-sm: 2px;
+  --radius-md: 8px;
+
+  /* Type scale, see plan/04 */
+  --text-display: clamp(48px, 8vw, 96px);
+  --text-display--line-height: 0.95;
+  --text-h2: clamp(28px, 4vw, 44px);
+  --text-h2--line-height: 1.05;
+  --text-body: 17px;
+  --text-body--line-height: 1.6;
+  --text-label: 13px;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.06em;
+
+  /* Slow horizontal drift for the testimonial marquee, see plan/05. Pure CSS,
+     duration overridden inline per instance. */
+  --animate-marquee: marquee 40s linear infinite;
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* The ScrollCue idle nudge (plan/24 A): the cyan playhead drifts slowly along
+     the hairline, priming "scroll plays the master pass". A nudge, not a bounce:
+     horizontal only. Motion-safe; reduced motion disables it via the global
+     reduced-motion guard above. */
+  --animate-playhead-nudge: playhead-nudge 3.2s ease-in-out infinite;
+  @keyframes playhead-nudge {
+    0%,
+    100% {
+      transform: translateX(-50%);
+    }
+    50% {
+      transform: translateX(50%);
+    }
+  }
+
+  /* The Services console tier word swap (brief motion spec). The label slides
+     up and fades in when the tier changes; reduced motion drops it to an
+     instant swap via the global reduced-motion guard above. */
+  @keyframes tier-swap {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+html {
+  color-scheme: dark;
+  /* Always reserve the scrollbar gutter so the fixed header and the page
+     content share one layout width and align to the pixel, and so opening a
+     modal never shifts the page. */
+  scrollbar-gutter: stable;
+}
+
+/* Anchor targets clear the fixed header, so focus and headings are never
+   obscured by the sticky bar (plan/13). One value, the header height plus a
+   little air. */
+:where(section[id], [id]) {
+  scroll-margin-top: var(--space-8);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible cyan focus ring on every interactive element */
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* Pointer affordance. Native button/select default to the arrow cursor, which
+   reads as not-clickable. Every interactive control shows the hand. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+a[href],
+label[for],
+summary,
+select {
+  cursor: pointer;
+}
+
+/* Respect reduced motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

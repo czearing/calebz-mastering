@@ -1,0 +1,9 @@
+.next
+out
+node_modules
+storybook-static
+.vercel
+plan
+_assets
+public
+package-lock.json

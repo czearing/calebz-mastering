@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1062762490,
+    "title": "We Should Go Back",
+    "slug": "we-should-go-back",
+    "genre": "Dance & EDM",
+    "artwork": "/work/we-should-go-back.jpg"
+  },
+  {
+    "id": 1050358258,
+    "title": "I Need You",
+    "slug": "i-need-you",
+    "genre": "Dance & EDM",
+    "artwork": "/work/i-need-you.jpg"
+  },
+  {
+    "id": 1049781487,
+    "title": "For Me",
+    "slug": "for-me",
+    "genre": "Dance & EDM",
+    "artwork": "/work/for-me.jpg"
+  },
+  {
+    "id": 1035062902,
+    "title": "Tell Me I'm Pretty (Icona Pop Version) - CalebZ Remix",
+    "slug": "tell-me-im-pretty-icona-pop-version-calebz-remix",
+    "genre": "Pop",
+    "artwork": "/work/tell-me-im-pretty-icona-pop-version-calebz-remix.jpg"
+  },
+  {
+    "id": 1033584952,
+    "title": "Found You - CalebZ Remix",
+    "slug": "found-you-calebz-remix",
+    "genre": "Dance & EDM",
+    "artwork": "/work/found-you-calebz-remix.jpg"
+  }
+]

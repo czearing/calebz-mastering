@@ -1,0 +1,8 @@
+# Cloudflare Pages config. Deploy later with:
+#   npm run pages:build   (builds .vercel/output via @cloudflare/next-on-pages)
+#   npx wrangler pages deploy .vercel/output/static
+# Local `next build` does not depend on this file.
+name = "calebz-mastering"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
