@@ -38,5 +38,5 @@ export const services: Services = {
   ],
   addOns: "Stem mastering, Dolby Atmos, rush delivery. Ask for a quote.",
   formats:
-    "24-bit WAV, streaming-optimized, instrumental and clean versions on request.",
+    "24-bit WAV, streaming-ready. Instrumental and clean versions on request.",
 };

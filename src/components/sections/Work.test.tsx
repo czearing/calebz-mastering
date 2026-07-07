@@ -66,23 +66,23 @@ describe("Work", () => {
     );
     const dialog = screen.getByRole("dialog", { name: first.title });
     expect(within(dialog).getByText(first.title)).toBeInTheDocument();
-    expect(within(dialog).getByText(first.genre)).toBeInTheDocument();
+    expect(within(dialog).getByText(first.genres[0])).toBeInTheDocument();
   });
 
   it("filters the grid by genre", async () => {
     const user = userEvent.setup();
     render(<Work />);
-    // Two genres in the placeholder set (Dance, Pop), so the filter shows.
-    const pop = work.tracks.filter((t) => t.genre === "Pop");
-    const dance = work.tracks.filter((t) => t.genre === "Dance");
-    await user.click(screen.getByRole("button", { name: "Pop", pressed: false }));
-    // Only Pop cards remain (matched by their accessible label).
+    // Tracks carry one or more genre tags, so the filter shows. Pick one genre
+    // and confirm only the cards carrying it remain.
+    const genre = "Tropical House";
+    const matching = work.tracks.filter((t) => t.genres.includes(genre));
+    await user.click(screen.getByRole("button", { name: genre, pressed: false }));
     expect(
       screen.getAllByRole("button", { name: /Open before and after/ }).length,
-    ).toBe(pop.length);
+    ).toBe(matching.length);
     await user.click(screen.getByRole("button", { name: "All", pressed: false }));
     expect(
       screen.getAllByRole("button", { name: /Open before and after/ }).length,
-    ).toBe(pop.length + dance.length);
+    ).toBe(work.tracks.length);
   });
 });

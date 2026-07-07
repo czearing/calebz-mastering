@@ -22,25 +22,22 @@ export function useScrollCue(): boolean {
   useEffect(() => {
     if (typeof window === "undefined") return;
     let raf = 0;
-    let dirty = true;
-    const onScroll = () => {
-      dirty = true;
-    };
+    // Coalesce scroll bursts to one read per frame, and schedule a frame only
+    // when scrolling actually happens, no idle rAF loop spinning at rest.
     const tick = () => {
-      if (dirty) {
-        dirty = false;
-        setVisible((prev) => {
-          const next = atTop();
-          return next === prev ? prev : next;
-        });
-      }
-      raf = window.requestAnimationFrame(tick);
+      raf = 0;
+      setVisible((prev) => {
+        const next = atTop();
+        return next === prev ? prev : next;
+      });
+    };
+    const onScroll = () => {
+      if (!raf) raf = window.requestAnimationFrame(tick);
     };
     setVisible(atTop());
     window.addEventListener("scroll", onScroll, { passive: true });
-    raf = window.requestAnimationFrame(tick);
     return () => {
-      window.cancelAnimationFrame(raf);
+      if (raf) window.cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
     };
   }, []);

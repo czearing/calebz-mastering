@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { cn } from "@/lib/cn";
 import { MotifSurface } from "./MotifSurface";
@@ -61,7 +61,7 @@ export function MotifCanvas({ className }: MotifCanvasProps) {
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
-  const onReady = useCallback(() => setReady(true), []);
+  const onReady = () => setReady(true);
 
   // Animate only when supported, on screen, and motion is allowed.
   const animate = supported && active && !reduced;
@@ -89,7 +89,7 @@ export function MotifCanvas({ className }: MotifCanvasProps) {
           camera={{ position: [0, 0.6, 2.4], fov: 50 }}
         >
           <Suspense fallback={null}>
-            <MotifSurface animate={animate} onReady={onReady} />
+            <MotifSurface animate={animate} active={active} onReady={onReady} />
           </Suspense>
         </Canvas>
       ) : null}

@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useMemo } from "react";
+import { forwardRef } from "react";
 import { shaderMaterial } from "@react-three/drei";
 import { extend, type ThreeElement } from "@react-three/fiber";
 import { Color, type ShaderMaterial, type Texture } from "three";
@@ -96,7 +96,7 @@ export type MotifMaterialProps = {
 // through the forwarded ref inside useFrame, so scroll never re-renders React.
 export const MotifMaterial = forwardRef<ShaderMaterial, MotifMaterialProps>(
   function MotifMaterial({ terrain }, ref) {
-    const color = useMemo(() => new Color(colorHex.cyan), []);
+    const color = new Color(colorHex.cyan);
     return (
       <motifShaderMaterial
         ref={ref}

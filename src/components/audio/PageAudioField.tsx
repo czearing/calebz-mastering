@@ -25,14 +25,6 @@ function setEnergy(v: number) {
   }
 }
 
-// The smoothed stereo width, published so other surfaces (cards, the total)
-// can react to how wide the current master is, not just how loud it is.
-function setWidth(v: number) {
-  if (typeof document !== "undefined") {
-    document.documentElement.style.setProperty("--audio-width", v.toFixed(3));
-  }
-}
-
 export function PageAudioField() {
   const playing = useSyncExternalStore(
     audioPlayingStore.subscribe,
@@ -44,14 +36,16 @@ export function PageAudioField() {
   useEffect(() => {
     if (!playing) {
       setEnergy(0);
-      setWidth(0);
       return;
     }
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
 
-    const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    // The field is blurred 13px at 0.66 opacity, so device-pixel sharpness is
+    // invisible here. Render the backing store at <=1 device pixel to roughly
+    // halve the per-frame fill cost on HiDPI screens with no visible change.
+    const dpr = Math.min(1, window.devicePixelRatio || 1);
     const resize = () => {
       canvas.width = Math.ceil(window.innerWidth * dpr);
       canvas.height = Math.ceil(window.innerHeight * dpr);
@@ -78,7 +72,7 @@ export function PageAudioField() {
     const r = new Float32Array(STEREO_FFT);
     // The smoothed level and stereo width live in the shared frame state, eased
     // so flipping to the wider master makes the field bloom open over about a
-    // second. Published as --audio-energy / --audio-width for the cards.
+    // second. The level is published as --audio-energy for the cards.
     const state = newFieldState();
     let raf = 0;
 
@@ -95,7 +89,6 @@ export function PageAudioField() {
         );
         if (drew) {
           setEnergy(state.energy * 0.6);
-          setWidth(state.widthSm);
         }
       }
       raf = requestAnimationFrame(draw);
@@ -106,7 +99,6 @@ export function PageAudioField() {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
       setEnergy(0);
-      setWidth(0);
     };
   }, [playing]);
 

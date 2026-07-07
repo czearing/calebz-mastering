@@ -49,9 +49,7 @@ describe("Dropzone", () => {
       'input[type="file"]',
     ) as HTMLInputElement;
     await userEvent.upload(input, wav());
-    expect(
-      await screen.findByText(/Ready once storage is connected/),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/^Ready$/)).toBeInTheDocument();
     expect(fetch).toHaveBeenCalledWith("/api/upload-url", expect.anything());
   });
 
@@ -80,8 +78,20 @@ describe("Dropzone", () => {
       'input[type="file"]',
     ) as HTMLInputElement;
     await userEvent.upload(input, wav("oops.wav"));
-    expect(await screen.findByText("oops.wav")).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("oops.wav")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Remove oops.wav" }));
-    expect(screen.queryByText("oops.wav")).not.toBeInTheDocument();
+    expect(screen.queryByDisplayValue("oops.wav")).not.toBeInTheDocument();
+  });
+
+  it("lets the customer rename a track", async () => {
+    render(<Dropzone orderId="o1" />);
+    const input = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+    await userEvent.upload(input, wav("bounce_final.wav"));
+    const nameField = await screen.findByDisplayValue("bounce_final.wav");
+    await userEvent.clear(nameField);
+    await userEvent.type(nameField, "Night Drive");
+    expect(screen.getByDisplayValue("Night Drive")).toBeInTheDocument();
   });
 });

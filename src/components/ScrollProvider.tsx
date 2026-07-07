@@ -31,8 +31,8 @@ function shouldSmooth(): boolean {
 
 // Lenis wraps native scroll on a rAF loop for 60fps (plan/03, plan/05). It runs
 // as a root instance, so it drives window scroll: window.scrollY stays the
-// source of truth and useScrollSignal keeps reading it, which is what couples
-// scroll to the playhead morph in the Hero motif (plan/23).
+// source of truth and the Hero motif keeps reading it (readProgress), which is
+// what couples scroll to the playhead morph in the Hero motif (plan/23).
 //
 // SSR safe: the server and first client paint render plain children (no Lenis),
 // so markup matches and there is no hydration mismatch. After mount we decide

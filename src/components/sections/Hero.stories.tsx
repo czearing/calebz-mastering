@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Hero } from "./Hero";
-import { sampleBefore, sampleAfter } from "@/components/audio/sample";
 
 const meta: Meta<typeof Hero> = {
   title: "Sections/Hero",
@@ -12,15 +11,5 @@ export default meta;
 
 type Story = StoryObj<typeof Hero>;
 
-// The signature, with default content and the placeholder A/B previews.
-export const Default: Story = {
-  args: { before: sampleBefore, after: sampleAfter },
-};
-
-// Sound-off path: sources without loudness still carry the visual proof.
-export const WithoutLoudness: Story = {
-  args: {
-    before: { ...sampleBefore, loudness: undefined },
-    after: { ...sampleAfter, loudness: undefined },
-  },
-};
+// The signature statement, with default content.
+export const Default: Story = {};

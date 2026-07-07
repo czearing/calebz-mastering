@@ -63,7 +63,7 @@ export function About({ content = defaultHero }: AboutProps) {
             {content.offer}
           </p>
           <a
-            href="#contact"
+            href="#services"
             className="inline-flex items-center justify-center gap-2 self-start rounded-[var(--radius-sm)] bg-cyan px-5 py-3 text-bg text-label font-mono uppercase tracking-[0.06em] transition-colors hover:bg-cyan-dim hover:text-text"
           >
             {content.primaryAction}

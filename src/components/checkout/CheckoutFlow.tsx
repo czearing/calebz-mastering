@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
-import { cartHasAddon, cartToConsole, toQueryString, type Cart } from "@/lib/checkout";
+import { useEffect, useRef, useState } from "react";
+import {
+  EMPTY_ADDON_STATE,
+  buildHydrationCart,
+  cartHasAddon,
+  cartToConsole,
+  toQueryString,
+  type Cart,
+} from "@/lib/checkout";
 import { useCheckout, FULL_FLOW, type Step } from "./useCheckout";
 import { usePersisted } from "./usePersisted";
 import { useUpload } from "./useUpload";
@@ -9,10 +16,27 @@ import { PackageStep } from "./PackageStep";
 import { AddonsStep } from "./AddonsStep";
 import { TracksStep } from "./TracksStep";
 import { SummaryStep } from "./SummaryStep";
+import { DetailsStep } from "./DetailsStep";
 import { UploadStep } from "./UploadStep";
+import { NotesStep } from "./NotesStep";
 import { PaymentStep } from "./PaymentStep";
 import { ConfirmStep } from "./ConfirmStep";
+import { CheckoutSteps } from "./CheckoutSteps";
 import { payerDefaults, type PayerInput } from "./payerSchema";
+
+// Short labels for the horizontal step bar. "confirm" is the success screen, so
+// it is not shown as a pending step.
+const STEP_LABELS: Record<Step, string> = {
+  package: "Package",
+  addons: "Add-ons",
+  tracks: "Tracks",
+  summary: "Review",
+  details: "Details",
+  upload: "Upload",
+  notes: "Notes",
+  payment: "Pay",
+  confirm: "Done",
+};
 
 export type CheckoutFlowProps = {
   // Seed cart, for stories and tests. Defaults to empty.
@@ -53,7 +77,42 @@ export function CheckoutFlow({
     persist ? `cz-checkout-payer-${orderId}` : undefined,
     payerDefaults,
   );
-  const stepNumber = flow.index + 1;
+  // Once an order is placed, the confirmation is durable: the "done" flag is
+  // persisted per order, so a reload or coming back to /start lands on the
+  // order-completed screen instead of restarting checkout. Starting a new order
+  // clears it. See plan/32.
+  const [done, setDone] = usePersisted<boolean>(
+    persist ? `cz-checkout-done-${orderId}` : undefined,
+    false,
+  );
+  // First-master-free mode: the order runs the same flow but reads "Free" instead
+  // of a price and the pay step becomes a no-charge claim. The free offer is ONE
+  // master, so claiming it caps the cart to a single track with no paid add-ons;
+  // the prior cart is restored if they undo. Lifted here so it survives stepping.
+  const [free, setFreeState] = useState(false);
+  const prevCart = useRef<Cart | null>(null);
+  const setFree = (next: boolean) => {
+    if (next && !free) {
+      prevCart.current = flow.cart;
+      flow.setCart(buildHydrationCart(1, EMPTY_ADDON_STATE));
+    } else if (!next && free && prevCart.current) {
+      flow.setCart(prevCart.current);
+    }
+    setFreeState(next);
+  };
+
+  // The horizontal step bar: every step except the final confirmation, with the
+  // current one lit. Hidden on the confirmation screen, which is its own moment.
+  const barSteps: Step[] = steps.filter((s) => s !== "confirm");
+  const barCurrent = barSteps.findIndex((s) => s === flow.step);
+
+  // A placed order is terminal: if the persisted "done" flag hydrates true (a
+  // reload or a return visit), jump straight to the confirmation rather than
+  // showing checkout again. Guarded so it never fights the user mid-flow.
+  const { goTo, step: currentStep } = flow;
+  useEffect(() => {
+    if (done && currentStep !== "confirm") goTo("confirm");
+  }, [done, currentStep, goTo]);
 
   // Mirror in-place order edits to the URL, so a reload rebuilds the edited
   // cart (the URL is what /start parses). Only when persisting, and guarded for
@@ -67,13 +126,18 @@ export function CheckoutFlow({
   }, [persist, cart]);
 
   return (
-    <div className="mx-auto flex w-full max-w-[var(--max-reading)] flex-col">
+    <div className="mx-auto flex w-full max-w-[var(--max-reading)] flex-col gap-[var(--space-8)]">
+      {flow.step !== "confirm" ? (
+        <CheckoutSteps
+          labels={barSteps.map((s) => STEP_LABELS[s])}
+          current={barCurrent}
+        />
+      ) : null}
+
       {flow.step === "package" ? (
         <PackageStep
           trackCount={flow.trackCount}
           totalCents={flow.totalCents}
-          index={stepNumber}
-          count={flow.stepCount}
           onAddTrack={() => flow.addTrack()}
           onRemoveLast={() => {
             const last = flow.cart.tracks.at(-1);
@@ -86,8 +150,6 @@ export function CheckoutFlow({
       {flow.step === "addons" ? (
         <AddonsStep
           cart={flow.cart}
-          index={stepNumber}
-          count={flow.stepCount}
           onSetAddon={flow.setAddon}
           onBack={flow.back}
           onNext={flow.next}
@@ -97,8 +159,6 @@ export function CheckoutFlow({
       {flow.step === "tracks" ? (
         <TracksStep
           cart={flow.cart}
-          index={stepNumber}
-          count={flow.stepCount}
           onRename={flow.renameTrack}
           onRemove={flow.removeTrack}
           onAddTrack={() => flow.addTrack()}
@@ -114,10 +174,19 @@ export function CheckoutFlow({
           isQuote={flow.isQuote}
           cart={flow.cart}
           hasStems={cartHasAddon(flow.cart, "stems")}
-          index={stepNumber}
-          count={flow.stepCount}
+          free={free}
+          onSetFree={setFree}
           onEditCart={flow.setCart}
           onBack={flow.index > 0 ? flow.back : undefined}
+          onNext={flow.next}
+        />
+      ) : null}
+
+      {flow.step === "details" ? (
+        <DetailsStep
+          payer={payer}
+          onPayerChange={setPayer}
+          onBack={flow.back}
           onNext={flow.next}
         />
       ) : null}
@@ -127,16 +196,23 @@ export function CheckoutFlow({
           cart={flow.cart}
           summary={flow.review}
           totalCents={flow.totalCents}
-          index={stepNumber}
-          count={flow.stepCount}
+          free={free}
           orderId={orderId}
-          payer={payer}
-          onPayerChange={setPayer}
           items={upload.items}
           onAddFiles={upload.add}
           onRemoveFile={upload.remove}
+          onRenameFile={upload.rename}
           onBack={flow.back}
           onContinue={flow.next}
+        />
+      ) : null}
+
+      {flow.step === "notes" ? (
+        <NotesStep
+          payer={payer}
+          onPayerChange={setPayer}
+          onBack={flow.back}
+          onNext={flow.next}
         />
       ) : null}
 
@@ -144,16 +220,24 @@ export function CheckoutFlow({
         <PaymentStep
           cart={flow.cart}
           payer={payer}
-          index={stepNumber}
-          count={flow.stepCount}
+          free={free}
           contactHref={contactHref}
           onBack={flow.back}
-          onPaid={() => flow.next()}
+          onPaid={() => {
+            setDone(true);
+            flow.next();
+          }}
         />
       ) : null}
 
       {flow.step === "confirm" ? (
-        <ConfirmStep name={payer.name} orderId={orderId} />
+        <ConfirmStep
+          name={payer.name}
+          orderId={orderId}
+          free={free}
+          startOverHref="/#services"
+          onStartOver={() => setDone(false)}
+        />
       ) : null}
     </div>
   );

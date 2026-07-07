@@ -1,7 +1,8 @@
 import type { Footer } from "./types";
+import { site } from "./site";
 
 // Copy from plan/08-content.md. YouTube link is real. Others are placeholders.
-// TODO: CalebZ to confirm email address and whether Instagram is used.
+// TODO: CalebZ to confirm whether Instagram is used.
 export const footer: Footer = {
   wordmark: "CalebZ",
   tagline: "Mastering, Seattle",
@@ -14,7 +15,7 @@ export const footer: Footer = {
     {
       id: "email",
       label: "Email",
-      href: "mailto:hello@example.com", // TODO: real email
+      href: `mailto:${site.contactEmail}`,
     },
     {
       id: "instagram",

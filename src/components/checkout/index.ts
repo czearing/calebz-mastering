@@ -7,9 +7,12 @@ export { PackageStep } from "./PackageStep";
 export { AddonsStep } from "./AddonsStep";
 export { TracksStep } from "./TracksStep";
 export { SummaryStep } from "./SummaryStep";
+export { DetailsStep } from "./DetailsStep";
 export { UploadStep } from "./UploadStep";
+export { NotesStep } from "./NotesStep";
 export { PaymentStep } from "./PaymentStep";
 export { ConfirmStep } from "./ConfirmStep";
+export { CheckoutSteps } from "./CheckoutSteps";
 
 export { AddonChip } from "./AddonChip";
 export { Dropzone } from "./Dropzone";

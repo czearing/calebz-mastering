@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
@@ -12,31 +11,26 @@ import {
 } from "@/lib/checkout";
 import { UploadStep } from "./UploadStep";
 import { useUpload } from "./useUpload";
-import { payerDefaults, type PayerInput } from "./payerSchema";
 
 function twoFlat() {
   return addTrack(addTrack(emptyCart(), "Night Drive"), "Afterglow");
 }
 const stemCart = setAddon(addTrack(emptyCart(), "Night Drive"), "track-1", "stems", 1);
 
-// Mirrors how the flow owns the payer and upload list, so the controlled
-// UploadStep behaves as it does in CheckoutFlow.
-function Harness({ cart, onContinue }: { cart: Cart; onContinue: (p: PayerInput) => void }) {
-  const [payer, setPayer] = useState<PayerInput>(payerDefaults);
+// Mirrors how the flow owns the upload list, so the controlled UploadStep
+// behaves as it does in CheckoutFlow. Contact details now live on DetailsStep.
+function Harness({ cart, onContinue }: { cart: Cart; onContinue: () => void }) {
   const upload = useUpload("o1");
   return (
     <UploadStep
       cart={cart}
       summary={reviewSummary(cart)}
       totalCents={cartTotalCents(cart)}
-      index={2}
-      count={4}
       orderId="o1"
-      payer={payer}
-      onPayerChange={setPayer}
       items={upload.items}
       onAddFiles={upload.add}
       onRemoveFile={upload.remove}
+      onRenameFile={upload.rename}
       onBack={() => {}}
       onContinue={onContinue}
     />
@@ -73,28 +67,20 @@ describe("UploadStep", () => {
       screen.getByRole("button", { name: /Drop your tracks/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/No charge yet\. You pay on the next step/),
+      screen.getByText(/No charge yet\. You pay at the end/),
     ).toBeInTheDocument();
   });
 
-  it("blocks continue until name, email, AND a file are in", async () => {
+  it("blocks continue until at least one file is in", async () => {
     const { onContinue } = setup();
-    const cta = screen.getByRole("button", { name: "Continue to payment" });
-    expect(cta).toBeDisabled();
-
-    await userEvent.type(screen.getByLabelText("Name"), "Ada");
-    await userEvent.type(screen.getByLabelText("Email"), "ada@studio.com");
-    // Valid contact but no file yet: still blocked, keeping the upload promise.
+    const cta = screen.getByRole("button", { name: "Continue" });
     expect(cta).toBeDisabled();
 
     await userEvent.upload(fileInput(), wav());
     await waitFor(() => expect(cta).toBeEnabled());
 
     await userEvent.click(cta);
-    expect(onContinue).toHaveBeenCalledWith({
-      name: "Ada",
-      email: "ada@studio.com",
-    });
+    expect(onContinue).toHaveBeenCalled();
   });
 
   it("shows how the upload maps to the order and lets a file be removed", async () => {
@@ -111,7 +97,7 @@ describe("UploadStep", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "Remove first.wav" }),
     );
-    expect(screen.queryByText("first.wav")).not.toBeInTheDocument();
+    expect(screen.queryByDisplayValue("first.wav")).not.toBeInTheDocument();
     expect(screen.getByText(/0 of 2 tracks added/)).toBeInTheDocument();
   });
 

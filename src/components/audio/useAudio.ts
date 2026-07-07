@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type UseAudio = {
   playing: boolean;
@@ -24,7 +24,7 @@ export function useAudio(src: string): UseAudio {
   const [duration, setDuration] = useState(0);
   const [ready, setReady] = useState(false);
 
-  const ensure = useCallback((): HTMLAudioElement => {
+  const ensure = (): HTMLAudioElement => {
     let el = ref.current;
     if (!el) {
       el = new Audio();
@@ -41,7 +41,7 @@ export function useAudio(src: string): UseAudio {
       ref.current = el;
     }
     return el;
-  }, [src]);
+  };
 
   // Keep src in sync if it changes after the engine exists.
   useEffect(() => {
@@ -64,25 +64,22 @@ export function useAudio(src: string): UseAudio {
     };
   }, []);
 
-  const play = useCallback(async () => {
+  const play = async () => {
     await ensure().play();
-  }, [ensure]);
+  };
 
-  const pause = useCallback(() => ref.current?.pause(), []);
+  const pause = () => ref.current?.pause();
 
-  const toggle = useCallback(() => {
+  const toggle = () => {
     if (ref.current?.paused === false) pause();
     else void play();
-  }, [pause, play]);
+  };
 
-  const seek = useCallback(
-    (time: number) => {
-      const el = ensure();
-      el.currentTime = Math.max(0, Math.min(time, el.duration || time));
-      setCurrentTime(el.currentTime);
-    },
-    [ensure],
-  );
+  const seek = (time: number) => {
+    const el = ensure();
+    el.currentTime = Math.max(0, Math.min(time, el.duration || time));
+    setCurrentTime(el.currentTime);
+  };
 
   return { playing, currentTime, duration, ready, play, pause, toggle, seek };
 }

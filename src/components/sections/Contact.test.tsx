@@ -36,9 +36,9 @@ beforeAll(() => {
   });
 });
 
-describe("Contact", () => {
+describe("Contact (commerce on, form)", () => {
   it("anchors the section at id=contact and exposes labeled fields", () => {
-    const { container } = render(<Contact />);
+    const { container } = render(<Contact commerce />);
     expect(container.querySelector("section#contact")).toBeInTheDocument();
     expect(screen.getByLabelText("Name")).toBeInTheDocument();
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
@@ -47,19 +47,36 @@ describe("Contact", () => {
   });
 
   it("shows validation errors and does not submit when required fields are empty", async () => {
-    render(<Contact />);
-    await userEvent.click(screen.getByRole("button", { name: /send one track/i }));
+    render(<Contact commerce />);
+    await userEvent.click(screen.getByRole("button", { name: /send message/i }));
     expect(await screen.findByText("Tell me your name.")).toBeInTheDocument();
     expect(submit).not.toHaveBeenCalled();
   });
 
   it("submits valid input and shows the confirmation in place", async () => {
-    render(<Contact />);
+    render(<Contact commerce />);
     await userEvent.type(screen.getByLabelText("Name"), "Mara Vance");
     await userEvent.type(screen.getByLabelText("Email"), "mara@studio.com");
-    await userEvent.click(screen.getByRole("button", { name: /send one track/i }));
+    await userEvent.click(screen.getByRole("button", { name: /send message/i }));
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
     const status = await screen.findByRole("status");
-    expect(status).toHaveTextContent(/Thanks\. I will get back to you/i);
+    expect(status).toHaveTextContent(/Thanks\. I'll reply within one business day/i);
+  });
+});
+
+// Launch default: a single email call to action, no form. The button opens a
+// pre-filled mailto; the address is also shown as plain text.
+describe("Contact (commerce off, email)", () => {
+  it("renders a pre-filled mailto and no form", () => {
+    const { container } = render(<Contact commerce={false} />);
+    expect(container.querySelector("section#contact")).toBeInTheDocument();
+    const cta = screen.getByRole("link", { name: "Email me" });
+    const href = cta.getAttribute("href") ?? "";
+    expect(href.startsWith("mailto:calebzofficial@gmail.com?")).toBe(true);
+    expect(href).toContain("subject=Mastering%20inquiry");
+    expect(href).toContain("body=");
+    // The address is reachable as plain text too, and there is no form.
+    expect(screen.getByRole("link", { name: "calebzofficial@gmail.com" })).toBeInTheDocument();
+    expect(screen.queryByLabelText("Name")).not.toBeInTheDocument();
   });
 });

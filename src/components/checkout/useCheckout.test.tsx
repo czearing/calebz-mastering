@@ -8,7 +8,7 @@ describe("useCheckout", () => {
     expect(result.current.step).toBe("package");
     expect(result.current.trackCount).toBe(0);
     expect(result.current.totalCents).toBe(0);
-    expect(result.current.stepCount).toBe(7);
+    expect(result.current.stepCount).toBe(9);
   });
 
   it("prices live as tracks are added and crosses tiers", () => {
@@ -30,17 +30,21 @@ describe("useCheckout", () => {
     expect(result.current.isQuote).toBe(true);
   });
 
-  it("runs the seeded 4-step flow starting on Review", () => {
+  it("runs the seeded flow starting on Review", () => {
     const { result } = renderHook(() => useCheckout(undefined, SEEDED_FLOW));
     expect(result.current.step).toBe("summary");
     expect(result.current.index).toBe(0);
-    expect(result.current.stepCount).toBe(4);
+    expect(result.current.stepCount).toBe(6);
   });
 
-  it("pages the seeded flow Review -> Upload -> Pay -> Confirm and stops", () => {
+  it("pages the seeded flow Review -> Details -> Upload -> Notes -> Pay -> Confirm and stops", () => {
     const { result } = renderHook(() => useCheckout(undefined, SEEDED_FLOW));
     act(() => result.current.next());
+    expect(result.current.step).toBe("details");
+    act(() => result.current.next());
     expect(result.current.step).toBe("upload");
+    act(() => result.current.next());
+    expect(result.current.step).toBe("notes");
     act(() => result.current.next());
     expect(result.current.step).toBe("payment");
     act(() => result.current.next());

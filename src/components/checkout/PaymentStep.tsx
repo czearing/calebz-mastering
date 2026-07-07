@@ -33,10 +33,10 @@ type CheckoutResponse =
 
 export type PaymentStepProps = {
   cart: Cart;
-  // The payer collected on the upload step, threaded in. No form here anymore.
+  // The payer collected on the details step, threaded in. No form here anymore.
   payer: PayerInput;
-  index: number;
-  count: number;
+  // First-master-free mode: no charge, no Stripe, claiming reveals confirm.
+  free?: boolean;
   onBack: () => void;
   // Called once settled (paid, or the configured:false demo) to reveal confirm.
   onPaid: (payer: PayerInput) => void;
@@ -48,8 +48,7 @@ const pubKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 export function PaymentStep({
   cart,
   payer,
-  index,
-  count,
+  free = false,
   onBack,
   onPaid,
   contactHref = "/#contact",
@@ -127,26 +126,42 @@ export function PaymentStep({
     );
   }
 
+  // First master free: no Stripe, no charge. Same "Pay" step, total reads Free.
+  if (free) {
+    return (
+      <div className="flex flex-col gap-[var(--space-6)]">
+        <StepHeader
+          title="Pay"
+          hint="Your first master is on me. I'll email you within a day, and it's usually back in about three days."
+        />
+        <p className="flex items-baseline justify-between border-b border-line pb-[var(--space-3)] font-mono text-label uppercase tracking-[0.06em] text-muted">
+          <span>Order total</span>
+          <span className="text-display font-mono tabular-nums normal-case tracking-normal text-cyan">
+            Free
+          </span>
+        </p>
+        <StepNav onBack={onBack}>
+          <Button onClick={() => onPaid(payer)}>Get my free master</Button>
+        </StepNav>
+        <p className="text-label font-mono text-muted">
+          No card needed for your first master.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-[var(--space-6)]">
-      <StepHeader index={index} count={count} title="Pay" />
+      <StepHeader
+        title="Pay"
+        hint="Once you pay, I get started. I'll email you within a day, and your master is usually back in about three days."
+      />
+
       <p className="flex items-baseline justify-between border-b border-line pb-[var(--space-3)] font-mono text-label uppercase tracking-[0.06em] text-muted">
         <span>Order total</span>
-        <span className="text-h2 normal-case tracking-normal text-text">
+        <span className="text-display font-mono tabular-nums normal-case tracking-normal text-text">
           {formatUsd(cartTotalCents(cart))}
         </span>
-      </p>
-
-      {/* Two plain lines, not a wall of reassurance: what happens next, and who
-          is being paid. The free-first-master invite and the revisions promise
-          live earlier, on Review. */}
-      <p className="text-body text-text">
-        Your tracks are in. I email you within one business day and master to
-        your reference, usually about three days.
-      </p>
-      <p className="text-body text-muted">
-        You are paying CalebZ, an independent mastering engineer in Seattle.
-        Payment runs through Stripe.
       </p>
 
       {failed ? (
@@ -157,9 +172,13 @@ export function PaymentStep({
 
       <StepNav onBack={onBack}>
         <Button onClick={pay} disabled={submitting}>
-          Pay
+          Pay {formatUsd(cartTotalCents(cart))}
         </Button>
       </StepNav>
+
+      <p className="text-label font-mono text-muted">
+        Payments are secured by Stripe.
+      </p>
     </div>
   );
 }

@@ -3,46 +3,29 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { ACCEPT_ATTR, useUpload, type UploadItem } from "./useUpload";
+import { UploadFileRow } from "./UploadFileRow";
 
 export type DropzoneProps = {
   orderId: string;
-  // True when the cart includes stem mastering. Stem orders are multiple files
-  // per track (the grouped stems), so the guidance must not say "one file per
-  // track", which contradicts what the customer paid for. See plan/32.
+  // True when the cart includes stem mastering: several files per track, so the
+  // count and guidance must not imply one-file-per-track. See plan/32.
   needsStems?: boolean;
-  // The number of tracks the order was paid for, so the zone can show how the
-  // upload matches the order ("2 of 6 tracks added") instead of letting a buyer
-  // send three files for a six-track order with no signal. See plan/32.
+  // Tracks paid for, so the zone can show how the upload matches the order.
   expected?: number;
-  // Reports how many files have been added, so the upload step can require at
-  // least one before continuing to payment. See plan/32.
   onCountChange?: (count: number) => void;
-  // Optional lifted controller: when the flow owns the upload state (so the
-  // file list survives stepping back to this step), it passes the list and the
-  // add/remove handlers in. Standalone (tests, stories) it falls back to its
-  // own hook. See plan/32.
+  // Optional lifted controller so the file list survives stepping back; falls
+  // back to its own hook standalone (tests, stories). See plan/32.
   items?: UploadItem[];
   onAdd?: (files: FileList | File[]) => void;
   onRemove?: (id: string) => void;
+  onRename?: (id: string, name: string) => void;
 };
 
-// The format line under the zone, switched on whether stems were ordered.
-const STEM_HINT =
-  "WAV or AIFF. Send the stems for each track, grouped together. Multiple files per track is expected.";
-const FLAT_HINT = "WAV or AIFF. One file per track.";
-
-const statusLabel: Record<string, string> = {
-  queued: "Queued",
-  uploading: "Uploading",
-  done: "Uploaded",
-  ready: "Ready once storage is connected",
-  error: "Failed, drop it again",
-};
-
-// Drag-and-drop plus browse. Keyboard operable: the zone is a real button so
-// Enter or Space opens the file picker, and a visible focus ring lands on it.
-// WAV or AIFF only, with per-file progress and a remove control on each file.
-// The prep guidance sits right at the dropzone. See plan/29 section 3, plan/13.
+// One full-width drop target (drag-and-drop OR click) and the files as clean
+// rows with the spec we read off each. Any heads-up sits on the specific file's
+// own row (see UploadFileRow), so it is always clear which track is hot/clipped.
+// The prep specs live in a quiet disclosure instead of a wall of always-on text.
+// Keyboard operable: the zone is a real button. See brain e3d9621c, plan/29 s3.
 export function Dropzone({
   orderId,
   needsStems = false,
@@ -51,11 +34,13 @@ export function Dropzone({
   items: extItems,
   onAdd,
   onRemove,
+  onRename,
 }: DropzoneProps) {
   const own = useUpload(orderId);
   const items = extItems ?? own.items;
   const add = onAdd ?? own.add;
   const remove = onRemove ?? own.remove;
+  const rename = onRename ?? own.rename;
   const inputRef = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
 
@@ -63,14 +48,11 @@ export function Dropzone({
     onCountChange?.(items.length);
   }, [items.length, onCountChange]);
 
-  // How the upload maps to the paid order. For stems the file count is not the
-  // track count (several files per track), so it counts files against tracks
-  // rather than implying a one-to-one match.
   const countLine =
     expected && expected > 0
       ? needsStems
-        ? `${items.length} ${items.length === 1 ? "file" : "files"} added for your ${expected} ${expected === 1 ? "track" : "tracks"}.`
-        : `${items.length} of ${expected} ${expected === 1 ? "track" : "tracks"} added.`
+        ? `${items.length} ${items.length === 1 ? "file" : "files"} for your ${expected} ${expected === 1 ? "track" : "tracks"}`
+        : `${items.length} of ${expected} ${expected === 1 ? "track" : "tracks"} added`
       : null;
 
   return (
@@ -89,14 +71,16 @@ export function Dropzone({
           add(e.dataTransfer.files);
         }}
         className={cn(
-          "flex min-h-[12rem] w-full flex-col items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-md)] border border-dashed p-[var(--space-6)] text-center transition-colors",
-          over ? "border-cyan bg-surface" : "border-line bg-surface hover:border-cyan-dim",
+          "flex min-h-[12rem] w-full flex-col items-center justify-center gap-[var(--space-3)] rounded-[var(--radius-md)] border border-dashed p-[var(--space-6)] text-center transition-colors",
+          over ? "border-cyan bg-cyan/[0.04]" : "border-line bg-surface hover:border-cyan-dim",
         )}
       >
+        <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={over ? "text-cyan" : "text-muted"}>
+          <path d="M12 16V4M8 8l4-4 4 4" />
+          <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+        </svg>
         <span className="text-body text-text">Drop your tracks, or browse</span>
-        <span className="text-label font-mono text-muted">
-          {needsStems ? STEM_HINT : FLAT_HINT}
-        </span>
+        <span className="text-label font-mono text-muted">WAV or AIFF</span>
       </button>
 
       <input
@@ -114,47 +98,34 @@ export function Dropzone({
       />
 
       {countLine ? (
-        <p className="text-label font-mono text-text" aria-live="polite">
+        <p className="text-label font-mono text-muted" aria-live="polite">
           {countLine}
         </p>
       ) : null}
 
-      <p className="text-label font-mono text-muted">
-        Native rate, 24-bit. Peaks around -3 to -6 dBFS. No clipping, no
-        master-bus limiter.
-      </p>
-
       {items.length > 0 ? (
         <ul className="flex flex-col gap-[var(--space-2)]">
           {items.map((item) => (
-            <li
+            <UploadFileRow
               key={item.id}
-              className="flex items-center justify-between gap-[var(--space-3)] rounded-[var(--radius-sm)] border border-line bg-surface px-[var(--space-3)] py-[var(--space-2)]"
-            >
-              <span className="min-w-0 flex-1 truncate text-body text-text">
-                {item.name}
-              </span>
-              <span
-                className="shrink-0 text-label font-mono text-muted"
-                aria-live="polite"
-              >
-                {statusLabel[item.status]}
-                {item.status === "uploading"
-                  ? ` ${Math.round(item.progress * 100)}%`
-                  : ""}
-              </span>
-              <button
-                type="button"
-                onClick={() => remove(item.id)}
-                aria-label={`Remove ${item.name}`}
-                className="shrink-0 rounded-[var(--radius-sm)] border border-line px-[var(--space-2)] py-[2px] text-label font-mono uppercase tracking-[0.06em] text-muted transition-colors hover:border-error hover:text-error"
-              >
-                Remove
-              </button>
-            </li>
+              item={item}
+              onRemove={remove}
+              onRename={rename}
+            />
           ))}
         </ul>
       ) : null}
+
+      <details className="text-label">
+        <summary className="cursor-pointer list-none font-mono uppercase tracking-[0.06em] text-muted transition-colors hover:text-text">
+          What&apos;s an ideal upload?
+        </summary>
+        <p className="mt-[var(--space-2)] text-muted">
+          {needsStems
+            ? "WAV or AIFF. Send the stems for each track, grouped together. Multiple files per track is expected. Native rate, 24-bit, peaks around -3 to -6 dBFS. No clipping, no master-bus limiter."
+            : "WAV or AIFF. One file per track. Native rate, 24-bit, peaks around -3 to -6 dBFS. No clipping, no master-bus limiter."}
+        </p>
+      </details>
     </div>
   );
 }

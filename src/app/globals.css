@@ -18,6 +18,9 @@
      contrast ratio about 7.3:1, so validation copy reads as an error, not
      as cyan helper text. Used only for form validation messages. */
   --error: #ff6b6b;
+  /* Advisory amber for non-blocking "heads up" notices (e.g. a hot upload).
+     Reads as caution, not failure, and passes AA on --bg at ~9:1. */
+  --warn: #f5b54a;
 
   /* Spacing, 8px base scale */
   --space-1: 4px;
@@ -41,6 +44,12 @@
   /* Layout */
   --max-content: 1200px;
   --max-reading: 64ch;
+  /* The fixed header's height. ONE source of truth: the Header is pinned to it
+     and anchor targets use it as scroll-margin-top, so a clicked section lands
+     flush under the bar at every viewport width. Previously the header sized to
+     its wordmark (a text-h2 clamp), so its height drifted 59-71px while the
+     scroll-margin was a fixed 64px and anchors never lined up to the pixel. */
+  --header-h: 72px;
 }
 
 /* Expose tokens to Tailwind v4 utilities */
@@ -53,6 +62,7 @@
   --color-cyan: var(--cyan);
   --color-cyan-dim: var(--cyan-dim);
   --color-error: var(--error);
+  --color-warn: var(--warn);
 
   --font-sans: var(--font-display), system-ui, sans-serif;
   --font-mono: var(--font-mono-label), ui-monospace, monospace;
@@ -122,10 +132,26 @@ html {
 }
 
 /* Anchor targets clear the fixed header, so focus and headings are never
-   obscured by the sticky bar (plan/13). One value, the header height plus a
-   little air. */
-:where(section[id], [id]) {
-  scroll-margin-top: var(--space-8);
+   obscured by the sticky bar (plan/13). Generic ids (form fields, focus
+   targets) stop exactly the header height below the top. */
+:where([id]) {
+  scroll-margin-top: var(--header-h);
+}
+
+/* Section anchors carry large vertical padding for scroll rhythm (--space-10
+   mobile / --space-12 desktop, set on the Section primitive). When you JUMP to
+   one, that top padding would otherwise drop the heading a whole 224px below the
+   header, a big void. So cancel the section's own top padding in the
+   scroll-margin and leave just a comfortable --space-7 gap, so the heading lands
+   neatly under the bar at every width. This only affects anchor jumps, never the
+   natural scroll spacing. The subtracted token must match the Section padding. */
+:where(section[id]) {
+  scroll-margin-top: calc(var(--header-h) + var(--space-7) - var(--space-10));
+}
+@media (min-width: 768px) {
+  :where(section[id]) {
+    scroll-margin-top: calc(var(--header-h) + var(--space-7) - var(--space-12));
+  }
 }
 
 body {
@@ -139,6 +165,27 @@ body {
 :focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 2px;
+}
+
+/* Order-confirmed success mark: the ring pops in, the check draws. Reduced
+   motion is honored by the global guard below, which snaps it to its end state. */
+@keyframes cz-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes cz-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 /* Pointer affordance. Native button/select default to the arrow cursor, which

@@ -51,7 +51,7 @@ export function ContactForm() {
   if (sent) {
     return (
       <p role="status" className="text-body text-text">
-        Thanks. I will get back to you within one business day.
+        Thanks. I&apos;ll reply within one business day.
       </p>
     );
   }
@@ -103,7 +103,7 @@ export function ContactForm() {
         as="textarea"
         rows={4}
         label="Message"
-        placeholder="Anything I should know about the track?"
+        placeholder="What can I help with?"
         {...register("message")}
         error={errors.message?.message}
       />
@@ -121,10 +121,10 @@ export function ContactForm() {
 
       <div className="flex flex-col gap-[var(--space-3)]">
         <Button type="submit" disabled={isSubmitting} className={cn(isSubmitting && "opacity-50")}>
-          Send one track
+          Send message
         </Button>
         <p className="text-label font-mono text-muted">
-          Two revisions included. If it is not right, we keep working until it is.
+          No commitment. I read every message myself.
         </p>
       </div>
     </form>

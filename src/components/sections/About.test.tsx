@@ -28,10 +28,10 @@ describe("About", () => {
     expect(img.getAttribute("src")).toMatch(/calebz-portrait\.jpg/);
   });
 
-  it("offers one Book action that anchors to #contact", () => {
+  it("offers one Book action that anchors to the cart at #services", () => {
     render(<About />);
     expect(
       screen.getByRole("link", { name: hero.primaryAction }),
-    ).toHaveAttribute("href", "#contact");
+    ).toHaveAttribute("href", "#services");
   });
 });

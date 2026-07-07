@@ -42,7 +42,7 @@ function dollars(cents: number): string {
 
 describe("Services console", () => {
   it("renders the header copy and the live readout from the catalog", () => {
-    render(<Services />);
+    render(<Services commerce />);
     expect(
       screen.getByRole("heading", {
         level: 2,
@@ -56,7 +56,7 @@ describe("Services console", () => {
 
   it("re-prices the whole release as the stepper crosses a tier", async () => {
     const user = userEvent.setup();
-    render(<Services />);
+    render(<Services commerce />);
     const add = screen.getByRole("button", { name: "Add one track" });
 
     await user.click(add); // 2 tracks, single
@@ -72,7 +72,7 @@ describe("Services console", () => {
 
   it("snaps the stepper to a tier when its tile is clicked", async () => {
     const user = userEvent.setup();
-    render(<Services />);
+    render(<Services commerce />);
     const albumTile = screen.getByRole("button", { name: /^Album,/ });
     await user.click(albumTile);
     expect(
@@ -82,7 +82,7 @@ describe("Services console", () => {
 
   it("an add-on toggle changes the total", async () => {
     const user = userEvent.setup();
-    render(<Services />);
+    render(<Services commerce />);
     const stems = screen.getByRole("button", { name: /Stem mastering/ });
     await user.click(stems);
     expect(stems).toHaveAttribute("aria-pressed", "true");
@@ -94,7 +94,7 @@ describe("Services console", () => {
 
   it("Atmos is excluded from the total but requested as a quote", async () => {
     const user = userEvent.setup();
-    render(<Services />);
+    render(<Services commerce />);
     const before = screen.getByText(/Single, 65 dollars, 1 track/);
     expect(before).toBeInTheDocument();
     const atmos = screen.getByRole("button", { name: /Dolby Atmos/ });
@@ -107,7 +107,7 @@ describe("Services console", () => {
 
   it("serializes the configured order into the /start href", async () => {
     const user = userEvent.setup();
-    render(<Services />);
+    render(<Services commerce />);
     await user.click(screen.getByRole("button", { name: "Add one track" }));
     await user.click(screen.getByRole("button", { name: "Add one track" }));
     await user.click(screen.getByRole("button", { name: /Stem mastering/ }));
@@ -116,5 +116,23 @@ describe("Services console", () => {
       expect(cta.getAttribute("href")).toContain("/start?tracks=3");
       expect(cta.getAttribute("href")).toContain("stems=1");
     }
+  });
+});
+
+// With commerce off (the launch default) the cart is replaced by a static
+// summary of what's included plus a single pointer to the contact section.
+// No checkout link, no repeated email.
+describe("Services (commerce off)", () => {
+  it("lists what's included and points to contact, with no checkout link", () => {
+    render(<Services commerce={false} />);
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Per-track mastering" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Two revisions included")).toBeInTheDocument();
+    const toContact = screen.getByRole("link", { name: "Send a track" });
+    expect(toContact.getAttribute("href")).toBe("#contact");
+    expect(
+      screen.queryByRole("link", { name: /Continue to checkout|Checkout/ }),
+    ).not.toBeInTheDocument();
   });
 });

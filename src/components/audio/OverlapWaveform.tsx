@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import { cn } from "@/lib/cn";
 
 export type OverlapWaveformProps = {
@@ -65,12 +65,11 @@ export function OverlapWaveform({
   className,
 }: OverlapWaveformProps) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const { before, after } = useMemo(() => {
-    const b = toBars(beforePeaks);
-    const a = toBars(afterPeaks);
-    const max = Math.max(0.0001, ...b, ...a);
-    return { before: barPath(b, max), after: barPath(a, max) };
-  }, [beforePeaks, afterPeaks]);
+  const bars = toBars(beforePeaks);
+  const afterBars = toBars(afterPeaks);
+  const barMax = Math.max(0.0001, ...bars, ...afterBars);
+  const before = barPath(bars, barMax);
+  const after = barPath(afterBars, barMax);
 
   const seekAt = (clientX: number) => {
     const el = ref.current;

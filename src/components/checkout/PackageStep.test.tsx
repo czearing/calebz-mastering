@@ -10,10 +10,7 @@ function setup(trackCount: number, totalCents: number) {
   render(
     <PackageStep
       trackCount={trackCount}
-      totalCents={totalCents}
-      index={1}
-      count={6}
-      onAddTrack={onAddTrack}
+      totalCents={totalCents}      onAddTrack={onAddTrack}
       onRemoveLast={onRemoveLast}
       onNext={onNext}
     />,

@@ -11,8 +11,8 @@ vi.mock("@/components/audio/ABPlayerLazy", () => ({
 }));
 
 const tracks: Track[] = [
-  { id: "a", title: "Alpha", artist: "One", genre: "Techno", cover: "/work/for-me.jpg", audio: placeholderPair(1) },
-  { id: "b", title: "Beta", artist: "Two", genre: "House", cover: "/work/i-need-you.jpg", audio: placeholderPair(2) },
+  { id: "a", title: "Alpha", artist: "One", genres: ["Techno"], cover: "/work/for-me.jpg", audio: placeholderPair(1) },
+  { id: "b", title: "Beta", artist: "Two", genres: ["House"], cover: "/work/i-need-you.jpg", audio: placeholderPair(2) },
 ];
 
 beforeEach(() => {

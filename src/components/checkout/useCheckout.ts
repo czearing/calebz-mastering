@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   type AddonId,
   type Cart,
@@ -22,7 +22,9 @@ export const STEPS = [
   "addons",
   "tracks",
   "summary",
+  "details",
   "upload",
+  "notes",
   "payment",
   "confirm",
 ] as const;
@@ -34,10 +36,18 @@ export type Step = (typeof STEPS)[number];
 // SEEDED_FLOW instead and never re-shows those three steps. See plan/32.
 export const FULL_FLOW: Step[] = [...STEPS];
 
-// The focused 4-step flow for a seeded hand-off: Review, Send your tracks, Pay,
-// Confirm. Upload-first: the customer hands over material before paying.
-// Numbered "Step 1 of 4" etc. No "of 7" anywhere. See plan/32.
-export const SEEDED_FLOW: Step[] = ["summary", "upload", "payment", "confirm"];
+// The focused flow for a seeded hand-off: Review the order, Your details (name
+// + email), Send your tracks, Pay, Confirm. Contact details are their own step
+// before the upload, so the heavy step (files) stands alone. The horizontal step
+// bar shows position; no "Step N of M" text. See plan/32.
+export const SEEDED_FLOW: Step[] = [
+  "summary",
+  "details",
+  "upload",
+  "notes",
+  "payment",
+  "confirm",
+];
 
 // One cart, one cursor, and pure derived pricing. No fetch, no DOM here so the
 // hook stays testable; the steps call the operations they need. The flow is the
@@ -51,16 +61,13 @@ export function useCheckout(initial?: Cart, flow: Step[] = FULL_FLOW) {
 
   const safeIndex = Math.min(index, steps.length - 1);
   const step = steps[safeIndex];
-  const derived = useMemo(
-    () => ({
-      lines: lineItems(cart),
-      review: reviewSummary(cart),
-      totalCents: cartTotalCents(cart),
-      isQuote: quoteOnly(cart),
-      trackCount: cart.tracks.length,
-    }),
-    [cart],
-  );
+  const derived = {
+    lines: lineItems(cart),
+    review: reviewSummary(cart),
+    totalCents: cartTotalCents(cart),
+    isQuote: quoteOnly(cart),
+    trackCount: cart.tracks.length,
+  };
 
   return {
     cart,

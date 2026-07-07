@@ -26,10 +26,7 @@ const meta: Meta<typeof SummaryStep> = {
     summary: reviewSummary(cart),
     totalCents: cartTotalCents(cart),
     isQuote: quoteOnly(cart),
-    hasStems: true,
-    index: 1,
-    count: 4,
-  },
+    hasStems: true,  },
 };
 
 export default meta;
@@ -52,9 +49,6 @@ export const Single: Story = {
     return {
       summary: reviewSummary(c),
       totalCents: cartTotalCents(c),
-      isQuote: quoteOnly(c),
-      index: 1,
-      count: 4,
-    };
+      isQuote: quoteOnly(c),    };
   })(),
 };

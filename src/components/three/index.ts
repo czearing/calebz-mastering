@@ -9,7 +9,5 @@ export { MotifCanvas, default } from "./MotifCanvas";
 export { MotifFallback } from "./MotifFallback";
 export { MotifMaterial } from "./MotifMaterial";
 export { MotifSurface } from "./MotifSurface";
-export { useScrollSignal } from "./useScrollSignal";
-export type { ScrollSignal } from "./useScrollSignal";
 export { hasWebGL, cappedDpr, prefersReducedMotion } from "./webgl";
 export { generateTerrain } from "./terrainData";

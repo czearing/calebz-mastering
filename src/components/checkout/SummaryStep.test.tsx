@@ -33,9 +33,10 @@ const cart = setAddon(
   1,
 );
 
-function setup(onBack?: () => void, hasStems = false) {
+function setup(onBack?: () => void, hasStems = false, free = false) {
   const onNext = vi.fn();
   const onEditCart = vi.fn();
+  const onSetFree = vi.fn();
   render(
     <SummaryStep
       summary={reviewSummary(cart)}
@@ -43,14 +44,14 @@ function setup(onBack?: () => void, hasStems = false) {
       isQuote={quoteOnly(cart)}
       cart={cart}
       hasStems={hasStems}
-      index={1}
-      count={4}
+      free={free}
+      onSetFree={onSetFree}
       onEditCart={onEditCart}
       onBack={onBack}
       onNext={onNext}
     />,
   );
-  return { onNext, onEditCart };
+  return { onNext, onEditCart, onSetFree };
 }
 
 describe("SummaryStep", () => {
@@ -95,13 +96,36 @@ describe("SummaryStep", () => {
         totalCents={cartTotalCents(cart)}
         isQuote={quoteOnly(cart)}
         cart={cart}
-        index={1}
-        count={4}
+        free={false}
+        onSetFree={() => {}}
         onEditCart={() => {}}
         onNext={() => {}}
       />,
     );
     expect(container.textContent?.toLowerCase()).not.toContain("console");
+  });
+
+  it("offers the first master free and toggles free mode on click", async () => {
+    const { onSetFree } = setup();
+    await userEvent.click(screen.getByRole("button", { name: /Make it free/ }));
+    expect(onSetFree).toHaveBeenCalledWith(true);
+  });
+
+  it("reads Free instead of a dollar total in free mode", () => {
+    setup(undefined, false, true);
+    const total = screen.getByText("Total").closest("div");
+    expect(within(total as HTMLElement).getByText("Free")).toBeInTheDocument();
+    expect(
+      within(total as HTMLElement).queryByText("$160.00"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("locks the order controls in free mode (one track, no add-ons)", () => {
+    setup(undefined, false, true);
+    // The add-track button is disabled (capped at one), and the add-ons ledger
+    // is disabled via its fieldset, so a free master cannot grow into a paid one.
+    expect(screen.getByRole("button", { name: "Add one track" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Stem mastering/ })).toBeDisabled();
   });
 
   it("edits the order in place instead of navigating away", async () => {

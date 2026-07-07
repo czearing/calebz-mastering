@@ -37,3 +37,26 @@ to Tailwind through `@theme`. A typed mirror for non-CSS consumers is in
 Each component is one file under 200 lines with a colocated story and test.
 See `src/components/ui/Button.tsx`, `Button.stories.tsx`, `Button.test.tsx`
 for the reference pattern every later component follows.
+
+## Feature flags (flights)
+
+Parts of the site ship behind flags in `src/lib/flags.ts`, read from
+`NEXT_PUBLIC_` env vars and inlined at build time. Both default **off** so a
+plain `npm run build` publishes the launch-safe site: inquiries come in by email
+instead of on-site checkout, and the testimonials grid stays hidden until real
+quotes exist.
+
+| Env var | Default | When on |
+|---------|---------|---------|
+| `NEXT_PUBLIC_FLAG_COMMERCE` | off | Live order console, cart, and `/start` checkout. When off, Services shows a direct email contact block and `/start` redirects home. |
+| `NEXT_PUBLIC_FLAG_TESTIMONIALS` | off | The "What artists say" section. |
+
+Accepted truthy values: `1`, `true`, `on`, `yes` (case-insensitive). Set them in
+a local `.env.local` (gitignored) or in your host's environment:
+
+```
+NEXT_PUBLIC_FLAG_COMMERCE=on
+NEXT_PUBLIC_FLAG_TESTIMONIALS=on
+```
+
+The launch contact address lives in `src/content/site.ts`.

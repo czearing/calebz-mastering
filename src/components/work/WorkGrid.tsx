@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { Track } from "@/content";
 import { AlbumCard } from "./AlbumCard";
@@ -52,15 +52,15 @@ export function WorkGrid({ tracks, className }: WorkGridProps) {
   const gridRef = useRef<HTMLUListElement | null>(null);
   useGridFlip(gridRef);
 
-  const genres = useMemo(
-    () => [...new Set(tracks.map((t) => t.genre))],
-    [tracks],
-  );
+  const genres = [...new Set(tracks.flatMap((t) => t.genres))];
   // Multi-select: pick any combination of genres (Dance and Pop together, say).
-  // An empty set means "All". Toggling a pill adds or removes that genre.
+  // An empty set means "All". Toggling a pill adds or removes that genre. A
+  // track shows if it carries any of the selected genres.
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const shown =
-    selected.size === 0 ? tracks : tracks.filter((t) => selected.has(t.genre));
+    selected.size === 0
+      ? tracks
+      : tracks.filter((t) => t.genres.some((g) => selected.has(g)));
 
   const toggleGenre = (g: string) =>
     setSelected((prev) => {

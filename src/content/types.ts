@@ -24,18 +24,13 @@ export type Hero = {
   eyebrow: string;
   headline: string;
   sub: string;
-  beforeLabel: string;
-  afterLabel: string;
   primaryAction: string;
-  playPrompt: string;
   founderNote: string;
   founderIcon: string;
   // Processed founder portrait for the "I'm CalebZ" block (design crops and
   // grades it to fit the dark palette). See plan/24.
   portrait: string;
   offer: string;
-  // The signature A/B sources for the hero (plan/23).
-  audio: AudioPair;
 };
 
 export type ServiceTier = {
@@ -61,7 +56,8 @@ export type Track = {
   id: string;
   title: string;
   artist: string;
-  genre: string;
+  // One or more genre tags for the Work card and genre filter (plan/24).
+  genres: string[];
   // Album cover art for the Work card (plan/24). Placeholder covers pulled
   // from the artist's SoundCloud; the user replaces with final art.
   cover: string;

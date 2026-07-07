@@ -20,7 +20,7 @@ const monoLabel = Space_Mono({
 export const metadata: Metadata = {
   title: "CalebZ Mastering",
   description:
-    "Independent mastering for electronic music. Loud, clean, and translatable from club systems to phone speakers.",
+    "Independent mastering for electronic music. Loud and clean, from club systems to phone speakers.",
 };
 
 export default function RootLayout({

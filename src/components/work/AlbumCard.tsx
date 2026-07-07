@@ -18,15 +18,13 @@ export type AlbumCardProps = {
 // so there is no re-render or jitter per move; disabled on touch and reduced
 // motion. Click, Enter, or Space opens the modal.
 export function AlbumCard({ track, onOpen }: AlbumCardProps) {
-  const tilt = useTilt();
+  const tiltRef = useTilt();
 
   return (
     <button
-      ref={tilt.ref}
+      ref={tiltRef}
       type="button"
       onClick={onOpen}
-      onPointerMove={tilt.onPointerMove}
-      onPointerLeave={tilt.onPointerLeave}
       aria-label={`Open before and after for ${track.title} by ${track.artist}`}
       className={cn(
         "group relative block aspect-square w-full overflow-hidden rounded-[var(--radius-md)]",

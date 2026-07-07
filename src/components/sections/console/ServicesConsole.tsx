@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   EMPTY_ADDON_STATE,
   addonUnitCents,
@@ -32,18 +32,9 @@ export function ServicesConsole({ startHref = "/start" }: ServicesConsoleProps) 
   const [addons, setAddons] = useState<ConsoleAddonState>(EMPTY_ADDON_STATE);
 
   const tier = tierForCount(trackCount);
-  const totalCents = useMemo(
-    () => consoleTotalCents(trackCount, addons),
-    [trackCount, addons],
-  );
-  const breakdown = useMemo(
-    () => buildBreakdown(trackCount, addons),
-    [trackCount, addons],
-  );
-  const href = useMemo(
-    () => `${startHref}?${toQueryString(trackCount, addons)}`,
-    [startHref, trackCount, addons],
-  );
+  const totalCents = consoleTotalCents(trackCount, addons);
+  const breakdown = buildBreakdown(trackCount, addons);
+  const href = `${startHref}?${toQueryString(trackCount, addons)}`;
 
   const readout = (
     <LiveTotal

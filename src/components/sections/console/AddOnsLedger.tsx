@@ -7,6 +7,9 @@ import { addonUnitCents } from "@/lib/checkout";
 export type AddOnsLedgerProps = {
   addons: ConsoleAddonState;
   onChange: (next: ConsoleAddonState) => void;
+  // When true the whole ledger is locked (native fieldset disable cascades to
+  // every control), e.g. a free first master takes no paid add-ons.
+  disabled?: boolean;
 };
 
 const row =
@@ -22,7 +25,7 @@ const miniStep =
 // extra format) carry a small +/- count; Atmos is quote-gated, rendered as a
 // toggle that sets a flag and never adds to the total. Each active row leaves a
 // faint cyan tick. Prices read from the catalog, never hardcoded.
-export function AddOnsLedger({ addons, onChange }: AddOnsLedgerProps) {
+export function AddOnsLedger({ addons, onChange, disabled = false }: AddOnsLedgerProps) {
   function setFlag(key: "stems" | "rush" | "extraRevision", on: boolean) {
     onChange({ ...addons, [key]: on });
   }
@@ -31,7 +34,10 @@ export function AddOnsLedger({ addons, onChange }: AddOnsLedgerProps) {
   }
 
   return (
-    <fieldset className="flex flex-col">
+    <fieldset
+      disabled={disabled}
+      className={cn("flex flex-col", disabled && "opacity-40")}
+    >
       <legend className="mb-[var(--space-2)] text-label font-mono uppercase tracking-[0.06em] text-muted">
         Add-ons
       </legend>

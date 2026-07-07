@@ -14,7 +14,7 @@ function setup() {
     onBack: vi.fn(),
     onNext: vi.fn(),
   };
-  render(<TracksStep cart={cart} index={3} count={6} {...props} />);
+  render(<TracksStep cart={cart} {...props} />);
   return props;
 }
 

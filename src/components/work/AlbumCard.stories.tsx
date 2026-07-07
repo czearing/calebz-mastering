@@ -7,7 +7,7 @@ const track: Track = {
   id: "first-light",
   title: "First Light",
   artist: "Kessler",
-  genre: "Techno",
+  genres: ["Techno"],
   cover: "/work/for-me.jpg",
   audio: placeholderPair(1),
 };

@@ -25,7 +25,7 @@ const single: WorkContent = {
       id: "track-1",
       title: "First Light",
       artist: "Kessler",
-      genre: "Techno",
+      genres: ["Techno"],
       cover: "/work/for-me.jpg",
       audio: placeholderPair(1),
     },

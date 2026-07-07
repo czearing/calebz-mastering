@@ -14,17 +14,14 @@ function mockCheckout(body: unknown, ok = true) {
 }
 
 async function pay() {
-  await userEvent.click(screen.getByRole("button", { name: "Pay" }));
+  await userEvent.click(screen.getByRole("button", { name: /^Pay/ }));
 }
 
 function renderStep(onPaid = vi.fn()) {
   render(
     <PaymentStep
       cart={cart}
-      payer={payer}
-      index={3}
-      count={4}
-      onBack={() => {}}
+      payer={payer}      onBack={() => {}}
       onPaid={onPaid}
     />,
   );
@@ -61,20 +58,25 @@ describe("PaymentStep", () => {
     expect(body.contact).toEqual(payer);
   });
 
-  it("surfaces the identity line so it is not a faceless void", () => {
+  it("notes that payment is secured by Stripe, in one plain line", () => {
     vi.stubGlobal("fetch", mockCheckout({ configured: false }));
     renderStep();
     expect(
-      screen.getByText(/independent mastering engineer in Seattle/),
+      screen.getByText(/Payments are secured by Stripe\./),
     ).toBeInTheDocument();
+    // The defensive identity bio that used to ride on this line is gone; the
+    // page wordmark carries identity now.
+    expect(
+      screen.queryByText(/mastering engineer in Seattle/),
+    ).not.toBeInTheDocument();
   });
 
   it("keeps the pay step to two plain lines, no wall of reassurance", () => {
     vi.stubGlobal("fetch", mockCheckout({ configured: false }));
     renderStep();
-    // What happens next, stated plainly.
+    // What happens next, stated plainly: work starts after payment.
     expect(
-      screen.getByText(/I email you within one business day/),
+      screen.getByText(/Once you pay, I get started/),
     ).toBeInTheDocument();
     // The free-first-master invite and the "until you are happy" line live
     // earlier, on Review, not stacked up at the point of paying.

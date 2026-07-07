@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import Image from "next/image";
 import { Button, Tag } from "@/components/ui";
 import { cn } from "@/lib/cn";
@@ -63,7 +63,7 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
     }
   }, [open, triggerRect]);
 
-  const requestClose = useCallback(() => {
+  const requestClose = () => {
     const dialog = ref.current;
     if (!dialog) return onClose();
     if (triggerRect && !reduced() && typeof dialog.animate === "function") {
@@ -80,7 +80,7 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
       dialog.close();
       onClose();
     }
-  }, [onClose, triggerRect]);
+  };
 
   if (!open) return null;
 
@@ -117,9 +117,11 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
           <h2 id={titleId} className="text-h2 font-sans text-text">
             {track.title}
           </h2>
-          <span className="flex items-center gap-[var(--space-3)]">
+          <span className="flex flex-wrap items-center gap-[var(--space-3)]">
             <span className="text-body text-muted">{track.artist}</span>
-            <Tag>{track.genre}</Tag>
+            {track.genres.map((g) => (
+              <Tag key={g}>{g}</Tag>
+            ))}
           </span>
         </header>
 
@@ -128,6 +130,7 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
           after={toAudioSource(track.audio.after)}
           title={`Before and after, ${track.title}`}
           playLabel={`Play ${track.title}`}
+          autoFocusPlay
         />
       </div>
     </dialog>

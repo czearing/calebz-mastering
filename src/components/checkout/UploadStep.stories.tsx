@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
 import {
   addTrack,
   cartTotalCents,
@@ -10,7 +9,6 @@ import {
 } from "@/lib/checkout";
 import { UploadStep } from "./UploadStep";
 import { useUpload } from "./useUpload";
-import { payerDefaults, type PayerInput } from "./payerSchema";
 
 function flatCart() {
   let cart = emptyCart();
@@ -24,24 +22,20 @@ function stemCart() {
   return cart;
 }
 
-// A live wrapper so the dropzone and the contact fields behave as they do in the
-// flow: the parent owns the payer and the uploaded files.
+// A live wrapper so the dropzone behaves as it does in the flow: the parent owns
+// the uploaded files. Contact details now live on the separate DetailsStep.
 function Live({ cart }: { cart: Cart }) {
-  const [payer, setPayer] = useState<PayerInput>(payerDefaults);
   const upload = useUpload("demo-order");
   return (
     <UploadStep
       cart={cart}
       summary={reviewSummary(cart)}
       totalCents={cartTotalCents(cart)}
-      index={2}
-      count={4}
       orderId="demo-order"
-      payer={payer}
-      onPayerChange={setPayer}
       items={upload.items}
       onAddFiles={upload.add}
       onRemoveFile={upload.remove}
+      onRenameFile={upload.rename}
       onBack={() => {}}
       onContinue={() => {}}
     />

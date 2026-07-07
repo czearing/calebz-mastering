@@ -1,45 +1,63 @@
 "use client";
 
 import { Tag } from "@/components/ui";
+import { SuccessCheck } from "./SuccessCheck";
 
 export type ConfirmStepProps = {
   // The payer's name, to greet them after payment.
   name?: string;
   // The order id, surfaced as a short reference the customer can quote.
   orderId: string;
+  // First-master-free mode: no payment to confirm, so the copy drops it.
+  free?: boolean;
+  // Where "Start another master" points (the Services configurator).
+  startOverHref?: string;
+  // Clears the persisted order so a fresh checkout can begin. Fired on the
+  // start-over link before it navigates away.
+  onStartOver?: () => void;
 };
 
-// Final step, after payment. Upload already happened on step 2, so there is no
-// dropzone here. Confirm that both the tracks and the payment are in, restate
-// the next steps and contact promise, and give a short order reference the
-// customer can quote in any reply. See plan/32.
-export function ConfirmStep({ name, orderId }: ConfirmStepProps) {
-  return (
-    <div className="flex flex-col gap-[var(--space-6)]">
-      <header className="flex flex-col gap-[var(--space-2)]">
-        <Tag className="self-start text-cyan">Order confirmed</Tag>
-        <h1 className="text-h2 font-sans text-text">
-          {name
-            ? `Thanks, ${name}. I have your tracks and your payment.`
-            : "Thanks. I have your tracks and your payment."}
-        </h1>
-        <p className="text-body text-muted">
-          I email you at your address within one business day, and your master
-          arrives through a private delivery link, yours alone and not indexed.
-          Turnaround is about three days from now. If anything is unclear, reply
-          to that email or reach me through the contact form.
-        </p>
-      </header>
+// The success moment, after payment (or a free claim). An animated check makes it
+// land as done, then it says plainly what happens next and gives a short order
+// reference. Upload already happened, so there is no dropzone here. See plan/32.
+export function ConfirmStep({
+  name,
+  orderId,
+  free = false,
+  startOverHref,
+  onStartOver,
+}: ConfirmStepProps) {
+  const heading = name ? `You're all set, ${name}.` : "You're all set.";
+  const next = free
+    ? "Your tracks are submitted and your first master is on me. I'll email you within a day, and it's usually back in about three days."
+    : "Your tracks are submitted and your payment went through. I'll email you within a day, and your master is usually back in about three days.";
 
-      <section className="flex flex-col gap-[var(--space-2)]">
-        <h2 className="text-label font-mono uppercase tracking-[0.06em] text-muted">
+  return (
+    <div className="flex flex-col items-center gap-[var(--space-5)] py-[var(--space-6)] text-center">
+      <SuccessCheck />
+      <Tag className="text-cyan">Order placed</Tag>
+      <h1 className="text-h2 font-sans text-text">{heading}</h1>
+      <p className="max-w-[var(--max-reading)] text-body text-muted">{next}</p>
+
+      <div className="mt-[var(--space-2)] flex flex-col items-center gap-[var(--space-1)] rounded-[var(--radius-md)] border border-line bg-surface px-[var(--space-6)] py-[var(--space-4)]">
+        <span className="text-label font-mono uppercase tracking-[0.06em] text-muted">
           Order reference
-        </h2>
-        <p className="text-body font-mono tabular-nums text-text">{orderId}</p>
-        <p className="text-label font-mono text-muted">
-          Quote this if you need to reach me about your order.
-        </p>
-      </section>
+        </span>
+        <span className="text-body font-mono tabular-nums text-text">{orderId}</span>
+      </div>
+      <p className="text-label font-mono text-muted">
+        Quote that if you need to reach me about your order.
+      </p>
+
+      {startOverHref ? (
+        <a
+          href={startOverHref}
+          onClick={onStartOver}
+          className="mt-[var(--space-2)] text-label font-mono uppercase tracking-[0.06em] text-muted transition-colors hover:text-cyan"
+        >
+          Start another master
+        </a>
+      ) : null}
     </div>
   );
 }

@@ -47,7 +47,7 @@ describe("ABPlayer", () => {
     expect(after.currentTime).toBe(1.5);
   });
 
-  it("level matches: the louder after source is attenuated below unity", async () => {
+  it("plays the master (after) at full loudness; before is not boosted", async () => {
     render(<ABPlayer before={sampleBefore} after={sampleAfter} />);
     await userEvent.click(
       screen.getByRole("button", { name: "Hear the difference" }),
@@ -55,10 +55,9 @@ describe("ABPlayer", () => {
     // Switch so the after source becomes the audible one and carries its gain.
     await userEvent.click(screen.getByRole("radio", { name: "After" }));
     const [before, after] = elements;
-    // after LUFS (-9.6) is louder than before (-18.4): its gain is below the
-    // quieter before reference (unity), so only the master differs, not volume.
-    expect(after.volume).toBeLessThan(1);
-    expect(after.volume).toBeGreaterThan(0);
+    // after LUFS (-9.6) is the loudest side → it plays at full unity (the real
+    // product loudness), never pulled down to the quiet raw before (-18.4).
+    expect(after.volume).toBe(1);
     expect(before.volume).toBe(0);
   });
 

@@ -8,8 +8,6 @@ import { StepNav } from "./StepNav";
 export type PackageStepProps = {
   trackCount: number;
   totalCents: number;
-  index: number;
-  count: number;
   onAddTrack: () => void;
   onRemoveLast: () => void;
   onNext: () => void;
@@ -29,8 +27,6 @@ function readsAs(n: number): string {
 export function PackageStep({
   trackCount,
   totalCents,
-  index,
-  count,
   onAddTrack,
   onRemoveLast,
   onNext,
@@ -40,8 +36,6 @@ export function PackageStep({
   return (
     <div className="flex flex-col gap-[var(--space-6)]">
       <StepHeader
-        index={index}
-        count={count}
         title="Pick your package"
         hint="Price is per track. EP and Album rates kick in as the count grows."
       />

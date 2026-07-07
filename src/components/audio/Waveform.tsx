@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo } from "react";
+import { useId } from "react";
 import { cn } from "@/lib/cn";
 import { colorHex } from "@/lib/tokens";
 
@@ -35,7 +35,7 @@ function toPath(peaks: number[]): string {
 
 export function Waveform({ peaks, progress = 0, className }: WaveformProps) {
   const clipId = useId();
-  const d = useMemo(() => toPath(peaks), [peaks]);
+  const d = toPath(peaks);
   const playX = Math.max(0, Math.min(1, progress)) * VIEW_W;
 
   return (

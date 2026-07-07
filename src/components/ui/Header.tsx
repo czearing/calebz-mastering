@@ -28,18 +28,20 @@ export function Header({ content = defaultNav }: HeaderProps) {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 w-full",
+        "fixed inset-x-0 top-0 z-50 h-[var(--header-h)] w-full",
         "border-b border-line bg-bg/85 backdrop-blur",
       )}
     >
       {/* Padding lives on the outer wrapper and the max-width column sits inside
           it, exactly like the Section primitive, so the wordmark left edge lines
-          up to the pixel with the page content below. */}
-      <div className="px-[var(--space-5)]">
+          up to the pixel with the page content below. The bar is pinned to
+          --header-h and the row fills it (h-full) with content centered, so the
+          height stays constant and anchor scroll-margin always matches. */}
+      <div className="h-full px-[var(--space-5)]">
         <div
           className={cn(
-            "mx-auto flex w-full max-w-[var(--max-content)] items-center",
-            "justify-between gap-[var(--space-4)] py-[var(--space-3)]",
+            "mx-auto flex h-full w-full max-w-[var(--max-content)] items-center",
+            "justify-between gap-[var(--space-4)]",
           )}
         >
           <a
