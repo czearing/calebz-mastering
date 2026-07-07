@@ -12,14 +12,6 @@ export const work: Work = {
   line: "Before and after, real masters. Use headphones.",
   tracks: [
     {
-      id: "down",
-      title: "↓",
-      artist: "Jexn Bxptiste",
-      genres: ["Hip-Hop"],
-      cover: "/work/down.jpg",
-      audio: workAudio["down"],
-    },
-    {
       id: "found-you",
       title: "Found You (CalebZ Remix)",
       artist: "CalebZ",
@@ -34,6 +26,22 @@ export const work: Work = {
       genres: ["Dubstep", "Trap"],
       cover: "/work/bad-dream.jpg",
       audio: workAudio["bad-dream"],
+    },
+    {
+      id: "tell-me-im-pretty",
+      title: "Tell Me I'm Pretty (CalebZ Remix)",
+      artist: "CalebZ",
+      genres: ["Pop", "Bass House"],
+      cover: "/work/tell-me-im-pretty.jpg",
+      audio: workAudio["tell-me-im-pretty"],
+    },
+    {
+      id: "down",
+      title: "↓",
+      artist: "Jexn Bxptiste",
+      genres: ["Hip-Hop"],
+      cover: "/work/down.jpg",
+      audio: workAudio["down"],
     },
   ],
 };

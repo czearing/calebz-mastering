@@ -7,6 +7,12 @@ import data from "./workAudio.json";
 //     (streaming upload vs CalebZ's master; two close masters, shown honestly).
 //   - found-you ("Found You (CalebZ Remix)"): raw mix vs refmaster auto-master
 //     (ref: Kygo "Higher Love"). before -15.6 / +0.3, after -10.2 / +0.1.
+//   - tell-me-im-pretty ("Tell Me I'm Pretty (CalebZ Remix)"): the SoundCloud
+//     upload vs the refmaster engine matched against a pop / bass-house library
+//     (base ref MEDUZA "Lose Control"; per-section: both drops -> ACRAZE "Do It
+//     To It", intro/build -> Dom Dolla "Miracle Maker", breakdown -> "Lose
+//     Control"). 126 BPM G#min, sub-forward bouncy drop. before -12.9 / +0.5,
+//     after -11.9 / 0.0 (crest 14.8->12.7, LRA 12.3->6.6, densified clean).
 //   - bad-dream ("Bad Dream (CalebZ Remix)"): raw mix vs refmaster master toward
 //     Skrillex "Scary Monsters" (tight-LRA heavy dubstep) with a raised limiting
 //     budget (REFMASTER_MAX_LIMITING=4) + density (--max-reduction 6) so it
