@@ -28,6 +28,14 @@ export const work: Work = {
       audio: workAudio["bad-dream"],
     },
     {
+      id: "hollywood-perfect",
+      title: "Hollywood Perfect (CalebZ Remix)",
+      artist: "CalebZ",
+      genres: ["Trap", "Hip-Hop"],
+      cover: "/work/hollywood-perfect.jpg",
+      audio: workAudio["hollywood-perfect"],
+    },
+    {
       id: "forest",
       title: "Forest",
       artist: "CalebZ",

@@ -18,13 +18,23 @@ import data from "./workAudio.json";
 //     budget (REFMASTER_MAX_LIMITING=4) + density (--max-reduction 6) so it
 //     densifies to dubstep loudness instead of landing soft. before -12.5 / +1.0,
 //     after -7.3 / +0.2 (crest 14.9->9.9, intro lifted ~1.7 dB, LRA 4.5, clean).
+//   - hollywood-perfect ("Hollywood Perfect (CalebZ Remix)"): a dark trap / rap
+//     remix (152 BPM, Emin, mid-scooped 808 drop) of Unknown Brain's track,
+//     mastered by pure library AUTO-SELECT (no flags/env vars) after seeding the
+//     library with reference-grade rap masters (21 Savage "Runnin"/"Glock In My
+//     Lap"/"a lot", Metro Boomin "Too Many Nights", Future "Mask Off"; lo-fi
+//     SoundCloud-era refs removed so they can't be picked). before -13.0 / +1.0,
+//     after -10.2 / 0.0 (sub 0.060 and bass 0.084 held, mid pulled back from a
+//     wrong melodic-bass pass, dark rap character, LRA 7.4->4.7).
 //   - forest ("Forest"): older SoundCloud original, melodic progressive house
-//     (Avicii "Silhouettes" lineage), mastered via refmaster against a curated
-//     WARM prog-house library (Kaskade & deadmau5 "I Remember", deadmau5
-//     "Strobe", Avicii "Silhouettes"/"Waiting For Love", SHM "Save The World").
-//     Refs chosen by tonal centroid to stay in character; both drops match
-//     "Silhouettes". before -12.6 / +0.8, after -11.0 / 0.0 (LRA 14.5->5.7,
-//     centroid 2114->2300 Hz so the warm/dark identity is kept, low end intact).
+//     (Avicii "Silhouettes" lineage), mastered via refmaster against a tight
+//     WARM-CORE prog-house library (Kaskade & deadmau5 "I Remember", deadmau5
+//     "Strobe", Avicii "Silhouettes"). Brighter refs (Waiting For Love, Save
+//     The World) were dropped because they mapped the two verse instances to
+//     divergent sections (0:59 sounded different from the same verse at 2:17);
+//     the warm core brings verse divergence back to the arrangement floor while
+//     the drops still match "Silhouettes" untouched. before -12.6 / +0.8,
+//     after -11.1 / -0.3 (LRA 14.5->6.4, centroid ~2350 Hz, in character).
 // ABPlayer.computeGain reads these LUFS to level-match the A/B so only the master
 // differs on playback. Peaks are the per-window amplitude envelope on a shared
 // scale, computed across the whole song.
