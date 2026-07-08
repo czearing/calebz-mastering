@@ -96,11 +96,11 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
         if (e.target === ref.current) requestClose();
       }}
       className={cn(
-        "m-auto w-[min(92vw,640px)] overflow-hidden rounded-[var(--radius-md)]",
+        "m-auto flex max-h-[92dvh] w-[min(92vw,640px)] flex-col overflow-hidden rounded-[var(--radius-md)]",
         "border border-line bg-surface p-0 text-text backdrop:bg-bg/45",
       )}
     >
-      <div className="relative aspect-[2.6] w-full">
+      <div className="relative aspect-[2.6] max-h-[30dvh] w-full shrink-0">
         <Image src={track.cover} alt="" fill sizes="640px" className="object-cover" />
         <Button
           variant="ghost"
@@ -112,7 +112,7 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
         </Button>
       </div>
 
-      <div className="flex flex-col gap-[var(--space-5)] p-[var(--space-5)]">
+      <div className="flex min-h-0 flex-1 flex-col gap-[var(--space-4)] overflow-y-auto overscroll-contain p-[var(--space-4)] sm:gap-[var(--space-5)] sm:p-[var(--space-5)]">
         <header className="flex flex-col gap-[var(--space-2)]">
           <h2 id={titleId} className="text-h2 font-sans text-text">
             {track.title}

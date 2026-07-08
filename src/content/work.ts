@@ -28,6 +28,14 @@ export const work: Work = {
       audio: workAudio["bad-dream"],
     },
     {
+      id: "forest",
+      title: "Forest",
+      artist: "CalebZ",
+      genres: ["Progressive House", "EDM"],
+      cover: "/work/forest.jpg",
+      audio: workAudio["forest"],
+    },
+    {
       id: "tell-me-im-pretty",
       title: "Tell Me I'm Pretty (CalebZ Remix)",
       artist: "CalebZ",

@@ -18,6 +18,13 @@ import data from "./workAudio.json";
 //     budget (REFMASTER_MAX_LIMITING=4) + density (--max-reduction 6) so it
 //     densifies to dubstep loudness instead of landing soft. before -12.5 / +1.0,
 //     after -7.3 / +0.2 (crest 14.9->9.9, intro lifted ~1.7 dB, LRA 4.5, clean).
+//   - forest ("Forest"): older SoundCloud original, melodic progressive house
+//     (Avicii "Silhouettes" lineage), mastered via refmaster against a curated
+//     WARM prog-house library (Kaskade & deadmau5 "I Remember", deadmau5
+//     "Strobe", Avicii "Silhouettes"/"Waiting For Love", SHM "Save The World").
+//     Refs chosen by tonal centroid to stay in character; both drops match
+//     "Silhouettes". before -12.6 / +0.8, after -11.0 / 0.0 (LRA 14.5->5.7,
+//     centroid 2114->2300 Hz so the warm/dark identity is kept, low end intact).
 // ABPlayer.computeGain reads these LUFS to level-match the A/B so only the master
 // differs on playback. Peaks are the per-window amplitude envelope on a shared
 // scale, computed across the whole song.
