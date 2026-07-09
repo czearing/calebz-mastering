@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 import Image from "next/image";
+import { track as trackEvent } from "@vercel/analytics";
 import { Button, Tag } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { ABPlayerLazy } from "@/components/audio/ABPlayerLazy";
@@ -33,14 +34,22 @@ function fromCard(dialog: HTMLElement, card: DOMRect): Keyframe {
   const scale = Math.max(0.1, card.width / d.width);
   const tx = card.left + card.width / 2 - (d.left + d.width / 2);
   const ty = card.top + card.height / 2 - (d.top + d.height / 2);
-  return { transform: `translate(${tx}px, ${ty}px) scale(${scale})`, opacity: 0 };
+  return {
+    transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
+    opacity: 0,
+  };
 }
 
 // Native <dialog> for the focus trap, Escape, backdrop, and ARIA. The wow is a
 // Web Animations entrance: the modal visibly grows out of the clicked card and
 // shrinks back on close (plan/26). Reliable in every browser, no View
 // Transitions or top-layer timing fragility. Focus returns to the trigger card.
-export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProps) {
+export function TrackModal({
+  track,
+  open,
+  triggerRect,
+  onClose,
+}: TrackModalProps) {
   const ref = useRef<HTMLDialogElement | null>(null);
   const titleId = useId();
 
@@ -57,10 +66,13 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
     if (!dialog || !open || dialog.open) return;
     dialog.showModal();
     if (triggerRect && !reduced() && typeof dialog.animate === "function") {
-      dialog.animate([fromCard(dialog, triggerRect), { transform: "none", opacity: 1 }], {
-        duration: 420,
-        easing: EASE,
-      });
+      dialog.animate(
+        [fromCard(dialog, triggerRect), { transform: "none", opacity: 1 }],
+        {
+          duration: 420,
+          easing: EASE,
+        },
+      );
     }
   }, [open, triggerRect]);
 
@@ -102,7 +114,13 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
       )}
     >
       <div className="relative aspect-[2.6] max-h-[22dvh] w-full shrink-0">
-        <Image src={track.cover} alt="" fill sizes="640px" className="object-cover" />
+        <Image
+          src={track.cover}
+          alt=""
+          fill
+          sizes="640px"
+          className="object-cover"
+        />
 
         {/* "Listen on" links: transparent icon buttons stacked on the cover's
             left, so a listener can open the full track on its platform. */}
@@ -115,13 +133,22 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Listen on ${platformLabel(link.platform)}`}
+                onClick={() =>
+                  trackEvent("Platform Click", {
+                    track: track.id,
+                    platform: link.platform,
+                  })
+                }
                 className={cn(
                   "flex h-9 w-9 items-center justify-center rounded-full",
                   "bg-bg/45 text-text backdrop-blur-sm transition-colors",
                   "hover:bg-bg/70 hover:text-cyan focus-visible:text-cyan",
                 )}
               >
-                <PlatformIcon platform={link.platform} className="h-[18px] w-[18px]" />
+                <PlatformIcon
+                  platform={link.platform}
+                  className="h-[18px] w-[18px]"
+                />
               </a>
             ))}
           </div>
@@ -153,11 +180,32 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
           </span>
         </header>
 
+        {track.caseStudy ? (
+          <dl className="shrink-0 overflow-hidden rounded-[var(--radius-sm)] border border-line text-label sm:grid sm:grid-cols-3">
+            {[
+              ["Issue", track.caseStudy.issue],
+              ["Change", track.caseStudy.change],
+              ["Result", track.caseStudy.result],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="grid grid-cols-[3.75rem_1fr] gap-2 border-b border-line p-2.5 last:border-b-0 sm:block sm:border-b-0 sm:border-r sm:p-3 sm:last:border-r-0"
+              >
+                <dt className="font-mono uppercase tracking-[0.06em] text-cyan">
+                  {label}
+                </dt>
+                <dd className="leading-relaxed text-muted sm:mt-1">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
+
         <ABPlayerLazy
           before={toAudioSource(track.audio.before)}
           after={toAudioSource(track.audio.after)}
           title={`Before and after, ${track.title}`}
           playLabel={`Play ${track.title}`}
+          analyticsId={track.id}
           autoFocusPlay
         />
       </div>

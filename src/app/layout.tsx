@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
+
+const siteUrl = "https://calebz-mastering.vercel.app";
+const description =
+  "Mastering for electronic music, hip-hop, and pop. Hear full-length before-and-after work by CalebZ in Seattle.";
 
 // Neo-grotesque display and UI face. Variable axis, see plan/04.
 const display = Space_Grotesk({
@@ -18,9 +24,37 @@ const monoLabel = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CalebZ Mastering",
-  description:
-    "Independent mastering for electronic music. Loud and clean, from club systems to phone speakers.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "CalebZ Mastering | Seattle Mastering Engineer",
+    template: "%s | CalebZ Mastering",
+  },
+  description,
+  alternates: { canonical: "/" },
+  authors: [{ name: "CalebZ" }],
+  creator: "CalebZ",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: "CalebZ Mastering",
+    title: "CalebZ Mastering | Seattle Mastering Engineer",
+    description,
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "CalebZ Mastering",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CalebZ Mastering | Seattle Mastering Engineer",
+    description,
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function RootLayout({
@@ -28,10 +62,32 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    name: "CalebZ Mastering",
+    url: siteUrl,
+    image: `${siteUrl}/calebz-portrait.jpg`,
+    email: "calebzofficial@gmail.com",
+    description,
+    areaServed: "Worldwide",
+    sameAs: [
+      "https://soundcloud.com/caleb_z",
+      "https://www.youtube.com/@CalebZaudio",
+    ],
+    serviceType: "Audio mastering",
+  };
+
   return (
     <html lang="en">
       <body className={`${display.variable} ${monoLabel.variable}`}>
         {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

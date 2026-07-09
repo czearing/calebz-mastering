@@ -59,6 +59,12 @@ export type TrackLink = {
   url: string;
 };
 
+export type TrackCaseStudy = {
+  issue: string;
+  change: string;
+  result: string;
+};
+
 export type Track = {
   id: string;
   title: string;
@@ -72,6 +78,7 @@ export type Track = {
   audio: AudioPair;
   // Optional "listen on" links, rendered as icon buttons on the modal cover.
   links?: TrackLink[];
+  caseStudy?: TrackCaseStudy;
 };
 
 export type Work = {

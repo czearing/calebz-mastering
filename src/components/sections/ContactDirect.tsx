@@ -1,3 +1,6 @@
+"use client";
+
+import { track } from "@vercel/analytics";
 import { Section } from "@/components/ui";
 import { site } from "@/content";
 import { buildMailto } from "@/lib/mailto";
@@ -17,7 +20,9 @@ const primaryCta =
   "text-label font-mono uppercase tracking-[0.06em] text-bg " +
   "transition-colors hover:bg-cyan-dim hover:text-text";
 
-export function ContactDirect({ email = site.contactEmail }: ContactDirectProps) {
+export function ContactDirect({
+  email = site.contactEmail,
+}: ContactDirectProps) {
   const href = buildMailto(email, site.inquiry);
 
   return (
@@ -28,7 +33,11 @@ export function ContactDirect({ email = site.contactEmail }: ContactDirectProps)
           tracks, how many songs you&apos;re mastering, and when you need them
           back. I usually reply the same day.
         </p>
-        <a href={href} className={primaryCta}>
+        <a
+          href={href}
+          className={primaryCta}
+          onClick={() => track("Contact Click", { source: "primary" })}
+        >
           Email me
         </a>
         <p className="text-label font-mono uppercase tracking-[0.06em] text-muted">
@@ -36,6 +45,7 @@ export function ContactDirect({ email = site.contactEmail }: ContactDirectProps)
           <a
             href={`mailto:${email}`}
             className="text-cyan underline-offset-4 hover:underline"
+            onClick={() => track("Contact Click", { source: "email" })}
           >
             {email}
           </a>

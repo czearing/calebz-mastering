@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { track } from "@vercel/analytics";
 import { cn } from "@/lib/cn";
 import { publishAudio } from "@/lib/audioReactive";
 import { useABAudio } from "./useABAudio";
@@ -17,6 +18,7 @@ export type ABPlayerProps = {
   title?: string;
   playLabel?: string;
   className?: string;
+  analyticsId?: string;
   // Move focus to the play button on mount, so the spacebar toggles playback
   // immediately. Used by the Work modal, where the dialog would otherwise focus
   // the Close button and a space press would dismiss the popup.
@@ -27,7 +29,10 @@ export type ABPlayerProps = {
 // so it should sound exactly as loud as it does in a music player. The "before" only ever gets pulled
 // DOWN (never boosted, so a hot raw upload can't clip), and only if it were somehow louder than the
 // master. So the mastered side is naturally louder AND cleaner, never attenuated to the raw mix.
-function computeGain(beforeLufs?: number, afterLufs?: number): { before: number; after: number } {
+function computeGain(
+  beforeLufs?: number,
+  afterLufs?: number,
+): { before: number; after: number } {
   if (beforeLufs == null || afterLufs == null) return { before: 1, after: 1 };
   return {
     before: Math.min(1, 10 ** ((afterLufs - beforeLufs) / 20)),
@@ -36,10 +41,23 @@ function computeGain(beforeLufs?: number, afterLufs?: number): { before: number;
 }
 
 // One compact LUFS and true-peak readout, the sound-off proof inline.
-function Numbers({ label, loudness, dim }: { label: string; loudness?: Loudness; dim?: boolean }) {
+function Numbers({
+  label,
+  loudness,
+  dim,
+}: {
+  label: string;
+  loudness?: Loudness;
+  dim?: boolean;
+}) {
   if (!loudness) return null;
   return (
-    <p className={cn("font-mono text-label tabular-nums", dim ? "text-muted" : "text-text")}>
+    <p
+      className={cn(
+        "font-mono text-label tabular-nums",
+        dim ? "text-muted" : "text-text",
+      )}
+    >
       <span className="uppercase tracking-[0.06em] text-muted">{label} </span>
       {loudness.lufs.toFixed(1)} LUFS
       <span className="text-muted"> / {loudness.truePeak.toFixed(1)} dBTP</span>
@@ -58,6 +76,7 @@ export function ABPlayer({
   title = "Hear the difference",
   playLabel = "Hear the difference",
   className,
+  analyticsId,
   autoFocusPlay = false,
 }: ABPlayerProps) {
   const gain = computeGain(before.loudness?.lufs, after.loudness?.lufs);
@@ -89,6 +108,14 @@ export function ABPlayer({
   }, [autoFocusPlay]);
 
   const progress = duration > 0 ? currentTime / duration : 0;
+  const onToggle = () => {
+    if (!playing) track("Track Play", { track: analyticsId ?? title });
+    toggle();
+  };
+  const onSideChange = (next: "before" | "after") => {
+    track("A/B Switch", { track: analyticsId ?? title, side: next });
+    setSide(next);
+  };
 
   return (
     <section
@@ -118,8 +145,13 @@ export function ABPlayer({
 
       <div className="relative z-10 flex flex-col gap-[clamp(0.5rem,1.7dvh,1.25rem)] p-[clamp(0.7rem,2dvh,1.25rem)]">
         <header className="flex items-center justify-between gap-3">
-          <PlayButton ref={playRef} playing={playing} onClick={toggle} label={playLabel} />
-          <ABToggle side={side} onChange={setSide} />
+          <PlayButton
+            ref={playRef}
+            playing={playing}
+            onClick={onToggle}
+            label={playLabel}
+          />
+          <ABToggle side={side} onChange={onSideChange} />
         </header>
 
         <OverlapWaveform
@@ -132,8 +164,16 @@ export function ABPlayer({
 
         <footer className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
           <div className="flex flex-col gap-1">
-            <Numbers label="Before" loudness={before.loudness} dim={side !== "before"} />
-            <Numbers label="After" loudness={after.loudness} dim={side !== "after"} />
+            <Numbers
+              label="Before"
+              loudness={before.loudness}
+              dim={side !== "before"}
+            />
+            <Numbers
+              label="After"
+              loudness={after.loudness}
+              dim={side !== "after"}
+            />
           </div>
           <p className="font-mono text-label tabular-nums text-muted">
             <span className="text-text">{formatTime(currentTime)}</span>

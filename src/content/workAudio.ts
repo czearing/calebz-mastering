@@ -20,10 +20,9 @@ import data from "./workAudio.json";
 //     after -7.3 / +0.2 (crest 14.9->9.9, intro lifted ~1.7 dB, LRA 4.5, clean).
 //   - hollywood-perfect ("Hollywood Perfect (CalebZ Remix)"): a dark trap / rap
 //     remix (152 BPM, Emin, mid-scooped 808 drop) of Unknown Brain's track,
-//     mastered by pure library AUTO-SELECT (no flags/env vars) after seeding the
-//     library with reference-grade rap masters (21 Savage "Runnin"/"Glock In My
-//     Lap"/"a lot", Metro Boomin "Too Many Nights", Future "Mask Off"; lo-fi
-//     SoundCloud-era refs removed so they can't be picked). before -13.0 / +1.0,
+//     mastered against reference-grade rap masters (21 Savage "Runnin"/"Glock
+//     In My Lap"/"a lot", Metro Boomin "Too Many Nights", Future "Mask Off").
+//     before -13.0 / +1.0,
 //     after -10.2 / 0.0 (sub 0.060 and bass 0.084 held, mid pulled back from a
 //     wrong melodic-bass pass, dark rap character, LRA 7.4->4.7).
 //   - forest ("Forest"): older SoundCloud original, melodic progressive house

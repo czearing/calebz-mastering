@@ -5,11 +5,15 @@ import { ABPlayer } from "./ABPlayer";
 import { sampleBefore, sampleAfter } from "./sample";
 import { installAudioStub } from "./testAudio";
 
+const { trackEvent } = vi.hoisted(() => ({ trackEvent: vi.fn() }));
+vi.mock("@vercel/analytics", () => ({ track: trackEvent }));
+
 // Capture every audio element the AB engine creates so we can assert the
 // gapless, level-matched switch without a real media engine.
 let elements: HTMLAudioElement[];
 
 beforeEach(() => {
+  trackEvent.mockClear();
   elements = installAudioStub();
 });
 
@@ -66,5 +70,26 @@ describe("ABPlayer", () => {
     expect(screen.getByText(/-18\.4 LUFS/)).toBeInTheDocument();
     expect(screen.getByText(/-9\.6 LUFS/)).toBeInTheDocument();
     expect(screen.getByText(/-1\.0 dBTP/)).toBeInTheDocument();
+  });
+
+  it("tracks play and A/B switches", async () => {
+    render(
+      <ABPlayer
+        before={sampleBefore}
+        after={sampleAfter}
+        analyticsId="first-light"
+      />,
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Hear the difference" }),
+    );
+    await userEvent.click(screen.getByRole("radio", { name: "After" }));
+    expect(trackEvent).toHaveBeenCalledWith("Track Play", {
+      track: "first-light",
+    });
+    expect(trackEvent).toHaveBeenCalledWith("A/B Switch", {
+      track: "first-light",
+      side: "after",
+    });
   });
 });
