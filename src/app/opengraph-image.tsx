@@ -20,7 +20,7 @@ export default function OpenGraphImage() {
       }}
     >
       <div style={{ color: "#48e9ff", fontSize: 26, letterSpacing: "0.12em" }}>
-        MASTERING • SEATTLE
+        CALEBZ MASTERING
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
         <div

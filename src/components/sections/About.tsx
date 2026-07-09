@@ -23,7 +23,6 @@ export function About({ content = defaultHero }: AboutProps) {
       <div className="border-t border-line pt-4">
         <div className="mb-8 flex items-center justify-between font-mono text-label uppercase tracking-[0.12em]">
           <span className="text-cyan">About</span>
-          <span className="text-muted">Seattle, WA</span>
         </div>
 
         <div className="grid items-end gap-8 md:grid-cols-12 md:gap-10">

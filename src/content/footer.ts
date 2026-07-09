@@ -5,7 +5,7 @@ import { site } from "./site";
 // TODO: CalebZ to confirm whether Instagram is used.
 export const footer: Footer = {
   wordmark: "CalebZ",
-  tagline: "Mastering, Seattle",
+  tagline: "Electronic / Hip-hop / Pop",
   links: [
     {
       id: "youtube",

@@ -6,7 +6,7 @@ import "./globals.css";
 
 const siteUrl = "https://calebz-mastering.vercel.app";
 const description =
-  "Mastering for electronic music, hip-hop, and pop. Hear full-length before-and-after work by CalebZ in Seattle.";
+  "Mastering for electronic music, hip-hop, and pop. Hear full-length before-and-after work by CalebZ.";
 
 // Neo-grotesque display and UI face. Variable axis, see plan/04.
 const display = Space_Grotesk({
@@ -26,7 +26,7 @@ const monoLabel = Space_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "CalebZ Mastering | Seattle Mastering Engineer",
+    default: "CalebZ Mastering | Mastering Engineer",
     template: "%s | CalebZ Mastering",
   },
   description,
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: siteUrl,
     siteName: "CalebZ Mastering",
-    title: "CalebZ Mastering | Seattle Mastering Engineer",
+    title: "CalebZ Mastering | Mastering Engineer",
     description,
     images: [
       {
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "CalebZ Mastering | Seattle Mastering Engineer",
+    title: "CalebZ Mastering | Mastering Engineer",
     description,
     images: ["/opengraph-image"],
   },

@@ -21,7 +21,6 @@ export type AudioPair = {
 };
 
 export type Hero = {
-  eyebrow: string;
   headline: string;
   sub: string;
   primaryAction: string;

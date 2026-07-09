@@ -6,7 +6,7 @@ describe("Footer", () => {
   it("renders the wordmark and tagline", () => {
     render(<Footer />);
     expect(screen.getByText("CalebZ")).toBeInTheDocument();
-    expect(screen.getByText("Mastering, Seattle")).toBeInTheDocument();
+    expect(screen.getByText("Electronic / Hip-hop / Pop")).toBeInTheDocument();
   });
 
   it("links to the real YouTube channel from content", () => {

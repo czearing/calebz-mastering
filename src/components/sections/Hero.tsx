@@ -48,9 +48,6 @@ export function Hero({ content = defaultHero }: HeroProps) {
 
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-[var(--max-content)] flex-col justify-center pb-24 pt-[calc(var(--header-h)+var(--space-7))]">
         <Reveal className="relative z-10 flex max-w-[47rem] flex-col items-start gap-5">
-          <p className="font-mono text-label uppercase tracking-[0.16em] text-cyan">
-            {content.eyebrow}
-          </p>
           <h1
             id="hero-headline"
             aria-label={content.headline}
@@ -62,18 +59,6 @@ export function Hero({ content = defaultHero }: HeroProps) {
           <p className="max-w-[32rem] text-body text-muted">{content.sub}</p>
           <HeroActions primaryAction={content.primaryAction} />
         </Reveal>
-
-        <div className="pointer-events-none absolute inset-x-0 bottom-[var(--space-8)] flex items-center gap-4">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
-            Raw
-          </span>
-          <span className="relative h-px flex-1 bg-line">
-            <span className="absolute left-[62%] top-1/2 h-5 w-px -translate-y-1/2 bg-cyan" />
-          </span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan">
-            Master
-          </span>
-        </div>
       </div>
     </section>
   );
