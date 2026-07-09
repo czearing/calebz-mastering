@@ -40,7 +40,6 @@ export {
   consoleTotalCents,
   consoleQuoteRequested,
   addonUnitCents,
-  toQueryString,
-  parseQuery,
 } from "./console";
 export type { ConsoleAddonState } from "./console";
+export { toQueryString, parseQuery } from "./consoleQuery";

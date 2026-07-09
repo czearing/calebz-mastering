@@ -1,14 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import {
-  EMPTY_ADDON_STATE,
-  buildHydrationCart,
-  cartHasAddon,
-  cartToConsole,
-  toQueryString,
-  type Cart,
-} from "@/lib/checkout";
+import { useEffect } from "react";
+import { cartHasAddon, cartToConsole, toQueryString } from "@/lib/checkout";
 import { useCheckout, FULL_FLOW, type Step } from "./useCheckout";
 import { usePersisted } from "./usePersisted";
 import { useUpload } from "./useUpload";
@@ -23,40 +16,10 @@ import { PaymentStep } from "./PaymentStep";
 import { ConfirmStep } from "./ConfirmStep";
 import { CheckoutSteps } from "./CheckoutSteps";
 import { payerDefaults, type PayerInput } from "./payerSchema";
+import { useFreeMaster } from "./useFreeMaster";
+import { STEP_LABELS, type CheckoutFlowProps } from "./checkoutFlowConfig";
 
-// Short labels for the horizontal step bar. "confirm" is the success screen, so
-// it is not shown as a pending step.
-const STEP_LABELS: Record<Step, string> = {
-  package: "Package",
-  addons: "Add-ons",
-  tracks: "Tracks",
-  summary: "Review",
-  details: "Details",
-  upload: "Upload",
-  notes: "Notes",
-  payment: "Pay",
-  confirm: "Done",
-};
-
-export type CheckoutFlowProps = {
-  // Seed cart, for stories and tests. Defaults to empty.
-  initialCart?: Cart;
-  // The ordered steps to page through. A seeded hand-off passes the short
-  // Review, Send your tracks, Pay, Confirm flow (SEEDED_FLOW) so numbering
-  // reads "of 4" and the builder steps never reappear. Defaults to the full
-  // flow.
-  flow?: Step[];
-  // Where quote-only and fallback CTAs route. The contact section on home.
-  contactHref?: string;
-  // The order id the upload keys against. Real flow gets it from the paid
-  // session; the demo passes a stable placeholder.
-  orderId?: string;
-  // Persist progress so a reload or stepping back does not lose it: the payer
-  // is mirrored to localStorage and in-place order edits are mirrored to the
-  // URL (the cart's source of truth on /start). Off for stories and tests so
-  // they stay hermetic. See plan/32.
-  persist?: boolean;
-};
+export type { CheckoutFlowProps } from "./checkoutFlowConfig";
 
 // The one client flow: a shell holding cart state and the current step, paging
 // through the steps in its flow. Each step is its own component; this shell only
@@ -85,21 +48,7 @@ export function CheckoutFlow({
     persist ? `cz-checkout-done-${orderId}` : undefined,
     false,
   );
-  // First-master-free mode: the order runs the same flow but reads "Free" instead
-  // of a price and the pay step becomes a no-charge claim. The free offer is ONE
-  // master, so claiming it caps the cart to a single track with no paid add-ons;
-  // the prior cart is restored if they undo. Lifted here so it survives stepping.
-  const [free, setFreeState] = useState(false);
-  const prevCart = useRef<Cart | null>(null);
-  const setFree = (next: boolean) => {
-    if (next && !free) {
-      prevCart.current = flow.cart;
-      flow.setCart(buildHydrationCart(1, EMPTY_ADDON_STATE));
-    } else if (!next && free && prevCart.current) {
-      flow.setCart(prevCart.current);
-    }
-    setFreeState(next);
-  };
+  const [free, setFree] = useFreeMaster(flow.cart, flow.setCart);
 
   // The horizontal step bar: every step except the final confirmation, with the
   // current one lit. Hidden on the confirmation screen, which is its own moment.

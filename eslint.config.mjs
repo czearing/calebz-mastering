@@ -56,6 +56,15 @@ const eslintConfig = [
     },
   },
   {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "max-lines": [
+        "error",
+        { max: 200, skipBlankLines: false, skipComments: false },
+      ],
+    },
+  },
+  {
     ignores: [
       "node_modules/**",
       ".next/**",

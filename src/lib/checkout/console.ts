@@ -9,6 +9,8 @@ import { addTrack, emptyCart, setAddon } from "./cart";
 import { ADDONS, cartTotalCents } from "./catalog";
 import type { AddonId, Cart } from "./types";
 
+export { parseQuery, toQueryString } from "./consoleQuery";
+
 // The console exposes a subset of add-ons. Per-track add-ons (stems, rush,
 // extraRevision) are on/off and apply to every track. Per-item add-ons
 // (altVersion, extraFormat) are integer counts. Atmos is a quote-gated flag:
@@ -147,59 +149,4 @@ export function consoleQuoteRequested(addons: ConsoleAddonState): boolean {
 // catalog so the console never hardcodes it.
 export function addonUnitCents(id: AddonId): number {
   return ADDONS.find((a) => a.id === id)?.priceCents ?? 0;
-}
-
-// Serialize the console config into a flat, documented query string for /start.
-// Scheme: tracks=N&stems=0|1&rush=0|1&extraRevision=0|1&altVersion=K&
-// extraFormat=K&atmos=0|1. Only tracks is always present; zero-valued flags and
-// counts are omitted to keep the URL short, and parse() defaults them to off.
-export function toQueryString(
-  trackCount: number,
-  addons: ConsoleAddonState,
-): string {
-  const params = new URLSearchParams();
-  params.set("tracks", String(Math.max(1, clampCount(trackCount))));
-  if (addons.stems) params.set("stems", "1");
-  if (addons.rush) params.set("rush", "1");
-  if (addons.extraRevision) params.set("extraRevision", "1");
-  const alt = clampCount(addons.altVersion);
-  if (alt > 0) params.set("altVersion", String(alt));
-  const fmt = clampCount(addons.extraFormat);
-  if (fmt > 0) params.set("extraFormat", String(fmt));
-  if (addons.atmos) params.set("atmos", "1");
-  return params.toString();
-}
-
-function flag(value: string | undefined): boolean {
-  return value === "1" || value === "true";
-}
-
-function count(value: string | undefined): number {
-  return clampCount(Number(value ?? 0));
-}
-
-// Parse the query params back into a console config. Tolerant of missing or
-// malformed values: a missing tracks defaults to one, flags default to off.
-// Accepts a URLSearchParams or a plain record (Next.js searchParams).
-export function parseQuery(
-  input: URLSearchParams | Record<string, string | string[] | undefined>,
-): { trackCount: number; addons: ConsoleAddonState } {
-  const get = (key: string): string | undefined => {
-    if (input instanceof URLSearchParams) return input.get(key) ?? undefined;
-    const raw = input[key];
-    return Array.isArray(raw) ? raw[0] : raw;
-  };
-
-  const tracks = Math.max(1, count(get("tracks")) || 1);
-  return {
-    trackCount: tracks,
-    addons: {
-      stems: flag(get("stems")),
-      rush: flag(get("rush")),
-      extraRevision: flag(get("extraRevision")),
-      altVersion: count(get("altVersion")),
-      extraFormat: count(get("extraFormat")),
-      atmos: flag(get("atmos")),
-    },
-  };
 }

@@ -1,5 +1,5 @@
 import { Header } from "@/components/ui";
-import { ScrollProvider } from "@/components/ScrollProvider";
+import { ScrollProvider } from "@/components/providers/ScrollProvider";
 import { flags } from "@/lib/flags";
 import { nav } from "@/content";
 import {
