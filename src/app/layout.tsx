@@ -62,6 +62,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isVercel = process.env.VERCEL === "1";
   const schema = {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
@@ -74,6 +75,8 @@ export default function RootLayout({
     sameAs: [
       "https://soundcloud.com/caleb_z",
       "https://www.youtube.com/@CalebZaudio",
+      "https://open.spotify.com/artist/564lyz9Wk0PY0XT6P6pnCk",
+      "https://tidal.com/artist/22376230",
     ],
     serviceType: "Audio mastering",
   };
@@ -86,8 +89,12 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
-        <Analytics />
-        <SpeedInsights />
+        {isVercel ? (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        ) : null}
       </body>
     </html>
   );

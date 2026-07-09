@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { MathUtils, type Group, type ShaderMaterial } from "three";
 import { MotifMaterial } from "./MotifMaterial";
@@ -27,7 +27,7 @@ const EPS = 0.001;
 // imperatively (no React setState per frame) and invalidates the demand
 // frameloop whenever progress or pointer moves so the morph keeps advancing.
 export function MotifSurface({ animate, active, onReady }: MotifSurfaceProps) {
-  const terrain = generateTerrain();
+  const [terrain] = useState(generateTerrain);
   const group = useRef<Group>(null);
   const primary = useRef<ShaderMaterial>(null);
   const echo = useRef<ShaderMaterial>(null);

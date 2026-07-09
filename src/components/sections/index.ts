@@ -23,6 +23,3 @@ export type { ContactProps } from "./Contact";
 
 export { Footer } from "./Footer";
 export type { FooterProps } from "./Footer";
-
-export { MobileBookBar } from "./MobileBookBar";
-export type { MobileBookBarProps } from "./MobileBookBar";

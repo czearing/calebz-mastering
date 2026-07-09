@@ -126,7 +126,6 @@ export type Nav = {
 
 export type Footer = {
   wordmark: string;
-  tagline: string;
   links: FooterLink[];
   finePrint: string;
 };

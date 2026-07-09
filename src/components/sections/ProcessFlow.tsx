@@ -26,7 +26,9 @@ export function ProcessFlow({ steps }: ProcessFlowProps) {
   useEffect(() => {
     const ol = olRef.current;
     if (!ol) return;
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const reduced = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     let centers: number[] = [];
 
     // Each dot's target Y is the vertical centre of its step number, in the
@@ -70,10 +72,13 @@ export function ProcessFlow({ steps }: ProcessFlowProps) {
       }
       if (headRef.current) {
         headRef.current.style.top = `${head}px`;
-        headRef.current.style.opacity = reduced || head > first + 0.5 ? "1" : "0";
+        headRef.current.style.opacity =
+          reduced || head > first + 0.5 ? "1" : "0";
       }
       centers.forEach((c, i) => {
-        const lit = reduced ? 1 : Math.max(0, Math.min(1, (head - (c - fade)) / fade));
+        const lit = reduced
+          ? 1
+          : Math.max(0, Math.min(1, (head - (c - fade)) / fade));
         const dot = dots.current[i];
         const num = nums.current[i];
         const txt = texts.current[i];
@@ -82,7 +87,7 @@ export function ProcessFlow({ steps }: ProcessFlowProps) {
           dot.style.backgroundColor = lit > 0.5 ? "var(--cyan)" : "var(--bg)";
           dot.style.borderColor = lit > 0.5 ? "var(--cyan)" : "var(--line)";
         }
-        if (num) num.style.opacity = `${0.28 + lit * 0.72}`;
+        if (num) num.style.opacity = `${0.55 + lit * 0.45}`;
         if (txt) txt.style.opacity = `${0.5 + lit * 0.5}`;
       });
     };
@@ -107,7 +112,10 @@ export function ProcessFlow({ steps }: ProcessFlowProps) {
   }, [steps.length]);
 
   return (
-    <ol ref={olRef} className="relative ml-[var(--space-3)] flex flex-col gap-[var(--space-9)]">
+    <ol
+      ref={olRef}
+      className="relative ml-[var(--space-3)] flex flex-col gap-[var(--space-9)]"
+    >
       <span
         ref={dimRef}
         aria-hidden
@@ -139,12 +147,15 @@ export function ProcessFlow({ steps }: ProcessFlowProps) {
       />
 
       {steps.map((s, i) => (
-        <li key={s.id} className="relative flex items-start gap-[var(--space-5)] pl-[var(--space-6)]">
+        <li
+          key={s.id}
+          className="relative flex items-start gap-[var(--space-5)] pl-[var(--space-6)]"
+        >
           <span
             ref={(el) => {
               nums.current[i] = el;
             }}
-            className="font-mono text-[1.75rem] leading-none tabular-nums text-cyan"
+            className="font-mono text-[clamp(1.75rem,4vw,2.5rem)] leading-none tabular-nums text-cyan"
           >
             {String(s.step).padStart(2, "0")}
           </span>
@@ -152,7 +163,7 @@ export function ProcessFlow({ steps }: ProcessFlowProps) {
             ref={(el) => {
               texts.current[i] = el;
             }}
-            className="max-w-[var(--max-reading)] pt-[0.35rem] text-body text-text"
+            className="max-w-[44rem] pt-[0.25rem] text-[clamp(1.05rem,2vw,1.3rem)] leading-relaxed text-text"
           >
             {s.text}
           </p>

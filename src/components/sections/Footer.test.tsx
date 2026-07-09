@@ -3,16 +3,28 @@ import { render, screen } from "@testing-library/react";
 import { Footer } from "./Footer";
 
 describe("Footer", () => {
-  it("renders the wordmark and tagline", () => {
+  it("renders the wordmark without a tagline", () => {
     render(<Footer />);
     expect(screen.getByText("CalebZ")).toBeInTheDocument();
-    expect(screen.getByText("Electronic / Hip-hop / Pop")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Electronic / Hip-hop / Pop"),
+    ).not.toBeInTheDocument();
   });
 
-  it("links to the real YouTube channel from content", () => {
+  it("links to the real music profiles", () => {
     render(<Footer />);
-    const yt = screen.getByRole("link", { name: "YouTube" });
-    expect(yt).toHaveAttribute("href", "https://www.youtube.com/@CalebZaudio");
+    expect(screen.getByRole("link", { name: "YouTube" })).toHaveAttribute(
+      "href",
+      "https://www.youtube.com/@CalebZaudio",
+    );
+    expect(screen.getByRole("link", { name: "Spotify" })).toHaveAttribute(
+      "href",
+      "https://open.spotify.com/artist/564lyz9Wk0PY0XT6P6pnCk",
+    );
+    expect(screen.getByRole("link", { name: "Tidal" })).toHaveAttribute(
+      "href",
+      "https://tidal.com/artist/22376230",
+    );
   });
 
   it("renders the artist icon and the fine print", () => {

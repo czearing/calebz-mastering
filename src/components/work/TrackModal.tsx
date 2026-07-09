@@ -7,6 +7,7 @@ import { Button, Tag } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { ABPlayerLazy } from "@/components/audio/ABPlayerLazy";
 import { PlatformIcon, platformLabel } from "./PlatformIcon";
+import { CaseStudyFacts } from "./CaseStudyFacts";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { toAudioSource, type Track } from "@/content";
 
@@ -180,25 +181,7 @@ export function TrackModal({
           </span>
         </header>
 
-        {track.caseStudy ? (
-          <dl className="shrink-0 overflow-hidden rounded-[var(--radius-sm)] border border-line text-label sm:grid sm:grid-cols-3">
-            {[
-              ["Issue", track.caseStudy.issue],
-              ["Change", track.caseStudy.change],
-              ["Result", track.caseStudy.result],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                className="grid grid-cols-[3.75rem_1fr] gap-2 border-b border-line p-2.5 last:border-b-0 sm:block sm:border-b-0 sm:border-r sm:p-3 sm:last:border-r-0"
-              >
-                <dt className="font-mono uppercase tracking-[0.06em] text-cyan">
-                  {label}
-                </dt>
-                <dd className="leading-relaxed text-muted sm:mt-1">{value}</dd>
-              </div>
-            ))}
-          </dl>
-        ) : null}
+        {track.caseStudy ? <CaseStudyFacts study={track.caseStudy} /> : null}
 
         <ABPlayerLazy
           before={toAudioSource(track.audio.before)}

@@ -19,22 +19,29 @@ export function useTilt(maxDeg = 6) {
       !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!fine) return;
 
+    let bounds: DOMRect | null = null;
+    const onEnter = () => {
+      bounds = el.getBoundingClientRect();
+    };
     const onMove = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
+      const r = bounds ?? el.getBoundingClientRect();
       const px = (e.clientX - r.left) / r.width - 0.5;
       const py = (e.clientY - r.top) / r.height - 0.5;
       el.style.transition = "transform 90ms linear";
       el.style.transform = `perspective(900px) rotateX(${(-py * 2 * maxDeg).toFixed(2)}deg) rotateY(${(px * 2 * maxDeg).toFixed(2)}deg) scale(1.025)`;
     };
     const onLeave = () => {
+      bounds = null;
       el.style.transition = `transform 420ms ${EASE}`;
       el.style.transform =
         "perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)";
     };
 
+    el.addEventListener("pointerenter", onEnter);
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointerleave", onLeave);
     return () => {
+      el.removeEventListener("pointerenter", onEnter);
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerleave", onLeave);
     };

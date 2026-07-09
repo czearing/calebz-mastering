@@ -1,26 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createABGraph, type ABGraph } from "./abAudioGraph";
+import { useAudioMetadata } from "./useAudioMetadata";
 
 export type ABSide = "before" | "after";
 
 // Time-domain window the goniometer reads per channel.
-export const STEREO_FFT = 2048;
-
-type Graph = {
-  ctx: AudioContext;
-  left: AnalyserNode;
-  right: AnalyserNode;
-};
-
-function AudioCtx(): typeof AudioContext | undefined {
-  if (typeof window === "undefined") return undefined;
-  return (
-    window.AudioContext ||
-    (window as unknown as { webkitAudioContext?: typeof AudioContext })
-      .webkitAudioContext
-  );
-}
+export { STEREO_FFT } from "./abAudioGraph";
 
 export type UseABAudio = {
   playing: boolean;
@@ -55,28 +42,12 @@ export function useABAudio(
   });
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const metadataDuration = useAudioMetadata(beforeSrc);
+  const [playbackDuration, setPlaybackDuration] = useState(0);
   const [side, setSideState] = useState<ABSide>("before");
   const sideRef = useRef<ABSide>("before");
-  const graphRef = useRef<Graph | null>(null);
-
-  useEffect(() => {
-    setDuration(0);
-    const probe = new Audio();
-    probe.preload = "metadata";
-    const update = () => {
-      if (Number.isFinite(probe.duration)) setDuration(probe.duration);
-    };
-    probe.addEventListener("loadedmetadata", update);
-    probe.addEventListener("durationchange", update);
-    probe.src = beforeSrc;
-    update();
-    return () => {
-      probe.removeEventListener("loadedmetadata", update);
-      probe.removeEventListener("durationchange", update);
-      probe.removeAttribute("src");
-    };
-  }, [beforeSrc]);
+  const graphRef = useRef<ABGraph | null>(null);
+  const duration = playbackDuration || metadataDuration;
 
   // Build the analyser graph once, on first play (a user gesture, so the
   // AudioContext is allowed to start). Both sources feed one channel splitter;
@@ -84,27 +55,9 @@ export function useABAudio(
   // side. This is what powers the live stereo field (plan/27).
   const setupGraph = () => {
     if (graphRef.current) return;
-    const Ctx = AudioCtx();
     const { before, after } = refs.current;
-    if (!Ctx || !before || !after) return;
-    try {
-      const ctx = new Ctx();
-      const splitter = ctx.createChannelSplitter(2);
-      const left = ctx.createAnalyser();
-      const right = ctx.createAnalyser();
-      left.fftSize = STEREO_FFT;
-      right.fftSize = STEREO_FFT;
-      splitter.connect(left, 0);
-      splitter.connect(right, 1);
-      for (const el of [before, after]) {
-        const src = ctx.createMediaElementSource(el);
-        src.connect(ctx.destination);
-        src.connect(splitter);
-      }
-      graphRef.current = { ctx, left, right };
-    } catch {
-      graphRef.current = null;
-    }
+    if (!before || !after) return;
+    graphRef.current = createABGraph(before, after);
   };
 
   // Fill the provided buffers with the live L and R samples. Returns false when
@@ -141,7 +94,7 @@ export function useABAudio(
       if (primary) {
         el.addEventListener("timeupdate", () => setCurrentTime(el.currentTime));
         el.addEventListener("durationchange", () =>
-          setDuration(Number.isFinite(el.duration) ? el.duration : 0),
+          setPlaybackDuration(Number.isFinite(el.duration) ? el.duration : 0),
         );
         el.addEventListener("play", () => setPlaying(true));
         el.addEventListener("pause", () => setPlaying(false));

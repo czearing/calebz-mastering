@@ -8,6 +8,8 @@ import { mockMatchMedia, mockDialog } from "@/components/work/testEnv";
 // Escape regex specials so titles like "Found You (CalebZ Remix)" match literally.
 const rx = (s: string) =>
   new RegExp(s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+const cardName = (title: string, artist: string) =>
+  new RegExp(`${rx(title).source}\\s+${rx(artist).source}`, "i");
 
 // The modal's A/B player loads via next/dynamic; stub it so opening a card does
 // not pull the audio engine into the section test.
@@ -48,7 +50,7 @@ describe("Work", () => {
     for (const track of work.tracks) {
       expect(
         screen.getByRole("button", {
-          name: rx(`${track.title} by ${track.artist}`),
+          name: cardName(track.title, track.artist),
         }),
       ).toBeInTheDocument();
     }
@@ -61,7 +63,7 @@ describe("Work", () => {
     expect(screen.getByText(first.title)).toBeInTheDocument();
     await user.click(
       screen.getByRole("button", {
-        name: rx(`${first.title} by ${first.artist}`),
+        name: cardName(first.title, first.artist),
       }),
     );
     const dialog = screen.getByRole("dialog", { name: first.title });
@@ -80,8 +82,6 @@ describe("Work", () => {
       screen.getByRole("combobox", { name: "Genre" }),
       genre,
     );
-    expect(
-      screen.getAllByRole("button", { name: /Open before and after/ }),
-    ).toHaveLength(matching.length);
+    expect(screen.getAllByRole("button")).toHaveLength(matching.length);
   });
 });

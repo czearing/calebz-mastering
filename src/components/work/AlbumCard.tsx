@@ -26,7 +26,6 @@ export function AlbumCard({ track, onOpen, featured = false }: AlbumCardProps) {
       ref={tiltRef}
       type="button"
       onClick={onOpen}
-      aria-label={`Open before and after for ${track.title} by ${track.artist}`}
       className={cn(
         "group block w-full text-left [transform-style:preserve-3d] [will-change:transform]",
         featured &&
@@ -78,15 +77,18 @@ export function AlbumCard({ track, onOpen, featured = false }: AlbumCardProps) {
             )}
           >
             {track.title}
-          </span>
+          </span>{" "}
           <span className="mt-1 block font-mono text-label uppercase tracking-[0.06em] text-muted">
             {track.artist}
           </span>
         </span>
         {featured ? (
-          <span className="shrink-0 font-mono text-label uppercase text-muted">
-            {track.genres.join(" / ")}
-          </span>
+          <>
+            {" "}
+            <span className="shrink-0 font-mono text-label uppercase text-muted">
+              {track.genres.join(" / ")}
+            </span>
+          </>
         ) : null}
       </span>
     </button>

@@ -138,19 +138,13 @@ html {
   scroll-margin-top: var(--header-h);
 }
 
-/* Section anchors carry large vertical padding for scroll rhythm (--space-10
-   mobile / --space-12 desktop, set on the Section primitive). When you JUMP to
-   one, that top padding would otherwise drop the heading a whole 224px below the
-   header, a big void. So cancel the section's own top padding in the
-   scroll-margin and leave just a comfortable --space-7 gap, so the heading lands
-   neatly under the bar at every width. This only affects anchor jumps, never the
-   natural scroll spacing. The subtracted token must match the Section padding. */
+/* Cancel section padding for anchor jumps, then leave a --space-7 gap. */
 :where(section[id]) {
-  scroll-margin-top: calc(var(--header-h) + var(--space-7) - var(--space-10));
+  scroll-margin-top: calc(var(--header-h) + var(--space-7) - var(--space-9));
 }
 @media (min-width: 768px) {
   :where(section[id]) {
-    scroll-margin-top: calc(var(--header-h) + var(--space-7) - var(--space-12));
+    scroll-margin-top: calc(var(--header-h) + var(--space-7) - var(--space-10));
   }
 }
 

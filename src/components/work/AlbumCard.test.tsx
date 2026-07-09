@@ -22,7 +22,7 @@ describe("AlbumCard", () => {
   it("is a real button labelled by the track", () => {
     render(<AlbumCard track={track} onOpen={() => {}} />);
     expect(
-      screen.getByRole("button", { name: /First Light by Kessler/i }),
+      screen.getByRole("button", { name: /First Light\s+Kessler/i }),
     ).toBeInTheDocument();
   });
 

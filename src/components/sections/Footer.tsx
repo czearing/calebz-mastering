@@ -9,8 +9,11 @@ export type FooterProps = {
 
 // Links, credits, and the artist mark. Last beat of the scroll: easy to follow.
 // See plan/07, plan/08.
-export function Footer({ content = footerContent, icon = "/calebz.jpg" }: FooterProps) {
-  const { wordmark, tagline, links, finePrint } = content;
+export function Footer({
+  content = footerContent,
+  icon = "/calebz.jpg",
+}: FooterProps) {
+  const { wordmark, links, finePrint } = content;
 
   return (
     <footer className="w-full border-t border-line px-[var(--space-5)] py-[var(--space-8)]">
@@ -23,12 +26,7 @@ export function Footer({ content = footerContent, icon = "/calebz.jpg" }: Footer
             height={48}
             className="h-[var(--space-7)] w-[var(--space-7)] rounded-full object-cover"
           />
-          <div className="flex flex-col">
-            <span className="text-h2 font-sans text-text">{wordmark}</span>
-            <span className="text-label font-mono uppercase text-muted">
-              {tagline}
-            </span>
-          </div>
+          <span className="text-h2 font-sans text-text">{wordmark}</span>
         </div>
 
         <nav aria-label="Footer">
@@ -37,6 +35,12 @@ export function Footer({ content = footerContent, icon = "/calebz.jpg" }: Footer
               <li key={link.id}>
                 <a
                   href={link.href}
+                  target={link.href.startsWith("http") ? "_blank" : undefined}
+                  rel={
+                    link.href.startsWith("http")
+                      ? "noopener noreferrer"
+                      : undefined
+                  }
                   className="inline-flex min-h-[var(--space-5)] items-center text-label font-mono uppercase text-muted hover:text-cyan"
                 >
                   {link.label}
