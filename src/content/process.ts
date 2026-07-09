@@ -7,22 +7,22 @@ export const process: Process = {
     {
       id: "step-1",
       step: 1,
-      text: "Send your mix. WAV, headroom around minus 6 dB, no master bus limiter.",
+      text: "Send a WAV with about 6 dB of headroom and no limiter on the master bus.",
     },
     {
       id: "step-2",
       step: 2,
-      text: "I master to your reference and the target loudness for your platforms.",
+      text: "I master the track against your references.",
     },
     {
       id: "step-3",
       step: 3,
-      text: "You get a private link to hear it in full.",
+      text: "I send a private link so you can hear the full master.",
     },
     {
       id: "step-4",
       step: 4,
-      text: "Two revisions included. We lock it when you are happy.",
+      text: "Two revisions are included. I deliver the final files after approval.",
     },
   ],
 };

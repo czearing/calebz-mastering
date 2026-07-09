@@ -8,8 +8,8 @@ import { workAudio } from "./workAudio";
 // auto-selecting a reference from the library and mastering toward it (Found You
 // -> Kygo "Higher Love"; Bad Dream -> Dabin "Alive"). See workAudio.ts.
 export const work: Work = {
-  title: "Selected work",
-  line: "Before and after, real masters. Use headphones.",
+  title: "Work",
+  line: "Full tracks. Switch between the mix and master.",
   tracks: [
     {
       id: "found-you",

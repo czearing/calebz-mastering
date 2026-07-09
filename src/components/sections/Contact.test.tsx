@@ -48,7 +48,9 @@ describe("Contact (commerce on, form)", () => {
 
   it("shows validation errors and does not submit when required fields are empty", async () => {
     render(<Contact commerce />);
-    await userEvent.click(screen.getByRole("button", { name: /send message/i }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /send message/i }),
+    );
     expect(await screen.findByText("Tell me your name.")).toBeInTheDocument();
     expect(submit).not.toHaveBeenCalled();
   });
@@ -57,15 +59,19 @@ describe("Contact (commerce on, form)", () => {
     render(<Contact commerce />);
     await userEvent.type(screen.getByLabelText("Name"), "Mara Vance");
     await userEvent.type(screen.getByLabelText("Email"), "mara@studio.com");
-    await userEvent.click(screen.getByRole("button", { name: /send message/i }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /send message/i }),
+    );
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
     const status = await screen.findByRole("status");
-    expect(status).toHaveTextContent(/Thanks\. I'll reply within one business day/i);
+    expect(status).toHaveTextContent(
+      /Thanks\. I'll reply within one business day/i,
+    );
   });
 });
 
 // Launch default: a single email call to action, no form. The button opens a
-// pre-filled mailto; the address is also shown as plain text.
+// pre-filled mailto.
 describe("Contact (commerce off, email)", () => {
   it("renders a pre-filled mailto and no form", () => {
     const { container } = render(<Contact commerce={false} />);
@@ -75,8 +81,6 @@ describe("Contact (commerce off, email)", () => {
     expect(href.startsWith("mailto:calebzofficial@gmail.com?")).toBe(true);
     expect(href).toContain("subject=Mastering%20inquiry");
     expect(href).toContain("body=");
-    // The address is reachable as plain text too, and there is no form.
-    expect(screen.getByRole("link", { name: "calebzofficial@gmail.com" })).toBeInTheDocument();
     expect(screen.queryByLabelText("Name")).not.toBeInTheDocument();
   });
 });

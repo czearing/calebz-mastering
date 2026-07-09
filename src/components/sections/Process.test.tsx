@@ -26,14 +26,22 @@ beforeAll(() => {
       return [];
     }
   }
-  Object.defineProperty(window, "IntersectionObserver", { writable: true, value: MockIO });
-  Object.defineProperty(globalThis, "IntersectionObserver", { writable: true, value: MockIO });
+  Object.defineProperty(window, "IntersectionObserver", {
+    writable: true,
+    value: MockIO,
+  });
+  Object.defineProperty(globalThis, "IntersectionObserver", {
+    writable: true,
+    value: MockIO,
+  });
 });
 
 describe("Process", () => {
   it("renders the heading and every step as a list item", () => {
     render(<Process />);
-    expect(screen.getByRole("heading", { name: "How it works" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "How it works" }),
+    ).toBeInTheDocument();
     const items = screen.getAllByRole("listitem");
     expect(items).toHaveLength(4);
   });
@@ -41,7 +49,7 @@ describe("Process", () => {
   it("renders the step text from content", () => {
     render(<Process />);
     expect(
-      screen.getByText(/private link to hear it in full/i),
+      screen.getByText(/private link so you can hear the full master/i),
     ).toBeInTheDocument();
   });
 

@@ -29,9 +29,8 @@ export function ContactDirect({
     <Section id="contact" heading="Get in touch">
       <div className="flex max-w-[var(--max-reading)] flex-col gap-[var(--space-5)]">
         <p className="text-body text-text">
-          Email&apos;s the easiest way to get me. Send over a few reference
-          tracks, how many songs you&apos;re mastering, and when you need them
-          back. I usually reply the same day.
+          Email me with your references, track count, and deadline. I usually
+          reply the same day.
         </p>
         <a
           href={href}
@@ -40,17 +39,6 @@ export function ContactDirect({
         >
           Email me
         </a>
-        <p className="text-label font-mono uppercase tracking-[0.06em] text-muted">
-          Or just email{" "}
-          <a
-            href={`mailto:${email}`}
-            className="text-cyan underline-offset-4 hover:underline"
-            onClick={() => track("Contact Click", { source: "email" })}
-          >
-            {email}
-          </a>
-          .
-        </p>
       </div>
     </Section>
   );
