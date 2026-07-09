@@ -26,11 +26,7 @@ export type Hero = {
   sub: string;
   primaryAction: string;
   founderNote: string;
-  founderIcon: string;
-  // Processed founder portrait for the "I'm CalebZ" block (design crops and
-  // grades it to fit the dark palette). See plan/24.
   portrait: string;
-  offer: string;
 };
 
 export type ServiceTier = {

@@ -7,8 +7,6 @@ export const hero: Hero = {
   sub: "Independent mastering for electronic music. Loud and clean.",
   primaryAction: "Hear the work",
   founderNote:
-    "I'm CalebZ, an electronic producer in Seattle. I got into mastering through my own music, and now I do it for other artists.",
-  founderIcon: "/calebz.jpg",
+    "I am a producer and mastering engineer based in Seattle. I started by mastering my own records. I keep the character of the mix, correct what gets in the way, and leave the rest alone.",
   portrait: "/calebz-portrait.jpg",
-  offer: "Send me one track and I'll master it free. One per artist.",
 };

@@ -12,62 +12,48 @@ export type AboutProps = {
 const PORTRAIT_ALT =
   "CalebZ, mastering engineer, in a dark sweater against a stone column.";
 
-// "Meet CalebZ": its own calm section after the hero proof and before Work
-// (plan/25). The founder note moved here out of the hero so the first viewport
-// stays a single A/B statement. Desktop is two columns on a 12-col grid: the
-// portrait left (cols 1 to 5) spanning both rows, the words right (cols 7 to
-// 12) as note over offer, the photo centered to the text block. The eye lands
-// on the face, then reads the note (F-pattern, plan/25). Mobile stacks in a
-// single column: eyebrow plus note first (the words carry the trust), then the
-// portrait, then the offer and Book action. The three blocks are direct grid
-// children placed with `order` (mobile) and explicit row/column (desktop), so
-// one DOM order serves both layouts. Tokens only; reads hero.portrait,
-// hero.founderNote, hero.offer from content.
+// Restrained editorial profile: portrait, identity, and direct founder copy.
 export function About({ content = defaultHero }: AboutProps) {
   return (
-    <Section id="about" aria-labelledby="about-eyebrow">
-      <div className="grid grid-cols-1 items-center gap-[var(--space-8)] md:grid-cols-12 md:gap-x-[var(--space-7)] md:gap-y-[var(--space-6)]">
-        {/* Portrait. Desktop cols 1 to 5, spanning both text rows, vertically
-            centered to the words. Mobile second, 4:5, full width. */}
-        <div className="order-2 md:order-none md:col-span-5 md:row-span-2 md:self-center">
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[var(--radius-md)] border border-line">
+    <Section
+      id="about"
+      aria-labelledby="about-title"
+      className="overflow-hidden !py-[var(--space-9)] md:!py-[var(--space-10)]"
+    >
+      <div className="border-t border-line pt-4">
+        <div className="mb-8 flex items-center justify-between font-mono text-label uppercase tracking-[0.12em]">
+          <span className="text-cyan">About</span>
+          <span className="text-muted">Seattle, WA</span>
+        </div>
+
+        <div className="grid items-end gap-8 md:grid-cols-12 md:gap-10">
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[var(--radius-md)] border border-line md:col-span-7">
             <Image
               src={content.portrait}
               alt={PORTRAIT_ALT}
               fill
-              sizes="(max-width: 768px) 92vw, 560px"
-              className="object-cover"
+              sizes="(max-width: 768px) 92vw, 620px"
+              className="object-cover saturate-[0.72]"
             />
           </div>
-        </div>
 
-        {/* Eyebrow plus founder note. Desktop top-right (cols 7 to 12, row 1),
-            mobile first. The note is capped near a 60ch reading column. */}
-        <div className="order-1 flex flex-col gap-[var(--space-4)] md:order-none md:col-span-6 md:col-start-7 md:row-start-1 md:self-end">
-          <p
-            id="about-eyebrow"
-            className="text-label font-mono uppercase tracking-[0.06em] text-cyan"
-          >
-            Meet CalebZ
-          </p>
-          <p className="max-w-[var(--max-reading)] text-body text-muted">
-            {content.founderNote}
-          </p>
-        </div>
-
-        {/* The free-master offer: a quiet --surface callout with the primary
-            Book affordance beneath it. Desktop bottom-right (row 2), mobile
-            last, after the portrait. */}
-        <div className="order-3 flex flex-col gap-[var(--space-4)] rounded-[var(--radius-md)] border border-line bg-surface p-[var(--space-5)] md:order-none md:col-span-6 md:col-start-7 md:row-start-2 md:self-start">
-          <p className="max-w-[var(--max-reading)] text-body text-text">
-            {content.offer}
-          </p>
-          <a
-            href="#services"
-            className="inline-flex items-center justify-center gap-2 self-start rounded-[var(--radius-sm)] bg-cyan px-5 py-3 text-bg text-label font-mono uppercase tracking-[0.06em] transition-colors hover:bg-cyan-dim hover:text-text"
-          >
-            {content.primaryAction}
-          </a>
+          <div className="md:col-span-5 md:pb-8">
+            <h2
+              id="about-title"
+              className="font-sans text-[clamp(2.75rem,6vw,4.75rem)] leading-[0.9] tracking-[-0.055em] text-text"
+            >
+              Caleb Zearing
+            </h2>
+            <p className="mt-4 font-mono text-label uppercase tracking-[0.1em] text-cyan">
+              Producer and mastering engineer
+            </p>
+            <p className="mt-8 text-body leading-relaxed text-muted">
+              {content.founderNote}
+            </p>
+            <p className="mt-10 border-t border-line pt-4 font-mono text-label uppercase tracking-[0.1em] text-muted">
+              Seattle, Washington
+            </p>
+          </div>
         </div>
       </div>
     </Section>

@@ -3,21 +3,18 @@ import { render, screen } from "@testing-library/react";
 import { About } from "./About";
 import { hero } from "@/content";
 
-// "Meet CalebZ" founder block (plan/25): an own labeled section with the
-// eyebrow, the founder note, the free-master offer, an informative portrait,
-// and one Book affordance to #contact.
 describe("About", () => {
-  it("exposes a labeled region titled by the eyebrow", () => {
+  it("exposes a labeled founder region", () => {
     render(<About />);
     expect(
-      screen.getByRole("region", { name: "Meet CalebZ" }),
+      screen.getByRole("region", { name: "Caleb Zearing" }),
     ).toBeInTheDocument();
   });
 
-  it("renders the founder note and the free-master offer from content", () => {
+  it("renders the founder note without a sales offer", () => {
     render(<About />);
     expect(screen.getByText(hero.founderNote)).toBeInTheDocument();
-    expect(screen.getByText(hero.offer)).toBeInTheDocument();
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 
   it("shows an informative portrait with real alt text", () => {
@@ -26,12 +23,5 @@ describe("About", () => {
       name: /CalebZ, mastering engineer/i,
     });
     expect(img.getAttribute("src")).toMatch(/calebz-portrait\.jpg/);
-  });
-
-  it("offers one Book action that anchors to the cart at #services", () => {
-    render(<About />);
-    expect(
-      screen.getByRole("link", { name: hero.primaryAction }),
-    ).toHaveAttribute("href", "#services");
   });
 });
