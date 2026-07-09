@@ -20,14 +20,20 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe("ABPlayer", () => {
-  it("never autoplays: no engine until the first explicit tap", async () => {
+  it("loads duration metadata without autoplay", async () => {
     render(<ABPlayer before={sampleBefore} after={sampleAfter} />);
-    expect(window.Audio).not.toHaveBeenCalled();
+    expect(elements).toHaveLength(1);
+    expect(elements[0].play).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(
+        (_, element) =>
+          element?.tagName === "P" && element.textContent === "0:00 / 0:03",
+      ),
+    ).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("button", { name: "Hear the difference" }),
     );
-    // Two sources created for the single play head.
-    expect(elements.length).toBe(2);
+    expect(elements).toHaveLength(3);
   });
 
   it("offers a mono BEFORE and AFTER toggle as a radiogroup", () => {
@@ -44,7 +50,7 @@ describe("ABPlayer", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "Hear the difference" }),
     );
-    const [before, after] = elements;
+    const [before, after] = elements.slice(-2);
     before.currentTime = 1.5;
     await userEvent.click(screen.getByRole("radio", { name: "After" }));
     // The newly audible side is aligned to the playhead, not restarted.
@@ -58,7 +64,7 @@ describe("ABPlayer", () => {
     );
     // Switch so the after source becomes the audible one and carries its gain.
     await userEvent.click(screen.getByRole("radio", { name: "After" }));
-    const [before, after] = elements;
+    const [before, after] = elements.slice(-2);
     // after LUFS (-9.6) is the loudest side → it plays at full unity (the real
     // product loudness), never pulled down to the quiet raw before (-18.4).
     expect(after.volume).toBe(1);

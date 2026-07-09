@@ -10,6 +10,7 @@ export function installAudioStub(duration = 3) {
     const el = document.createElement("audio") as HTMLAudioElement;
     el.play = vi.fn().mockResolvedValue(undefined);
     el.pause = vi.fn();
+    el.load = vi.fn();
     Object.defineProperty(el, "duration", {
       value: duration,
       configurable: true,

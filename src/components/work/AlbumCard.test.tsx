@@ -26,11 +26,16 @@ describe("AlbumCard", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows only the cover, no metadata text (that lives in the modal)", () => {
+  it("shows the track identity below the cover", () => {
     render(<AlbumCard track={track} onOpen={() => {}} />);
-    expect(screen.queryByText("First Light")).not.toBeInTheDocument();
-    expect(screen.queryByText("Kessler")).not.toBeInTheDocument();
+    expect(screen.getByText("First Light")).toBeInTheDocument();
+    expect(screen.getByText("Kessler")).toBeInTheDocument();
     expect(screen.queryByText("Techno")).not.toBeInTheDocument();
+  });
+
+  it("shows genre on the lead card", () => {
+    render(<AlbumCard track={track} featured onOpen={() => {}} />);
+    expect(screen.getByText("Techno")).toBeInTheDocument();
   });
 
   it("opens on click and on keyboard (Enter, Space)", async () => {

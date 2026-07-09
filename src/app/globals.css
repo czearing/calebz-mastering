@@ -42,7 +42,7 @@
   --border-line: 1px;
 
   /* Layout */
-  --max-content: 1200px;
+  --max-content: 900px;
   --max-reading: 64ch;
   /* The fixed header's height. ONE source of truth: the Header is pinned to it
      and anchor targets use it as scroll-margin-top, so a clicked section lands

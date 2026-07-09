@@ -5,70 +5,24 @@ import { cn } from "@/lib/cn";
 import type { Track } from "@/content";
 import { AlbumCard } from "./AlbumCard";
 import { TrackModal } from "./TrackModal";
-import { useGridFlip } from "./useGridFlip";
-
-// One genre filter pill. Helps an artist see only the work close to their own
-// sound (plan/24). A real toggle button with aria-pressed.
-function GenrePill({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={cn(
-        "inline-flex min-h-[var(--space-6)] items-center rounded-[var(--radius-sm)] border",
-        "px-[var(--space-3)] text-label font-mono uppercase tracking-[0.06em] transition-colors",
-        active
-          ? "border-cyan text-cyan"
-          : "border-line text-muted hover:border-muted hover:text-text",
-      )}
-    >
-      {label}
-    </button>
-  );
-}
 
 export type WorkGridProps = {
   tracks: Track[];
   className?: string;
 };
 
-// Fluid responsive grid: auto-fit minmax capped so cards size themselves and
-// reflow with no overflow (plan/24 B). Generous gaps so it breathes. Owns which
-// track's modal is open, captures the clicked card so the modal grows out of it
-// (plan/26), and returns focus to that card on close.
+// Editorial gallery with one lead track and a smaller supporting grid.
 export function WorkGrid({ tracks, className }: WorkGridProps) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [rect, setRect] = useState<DOMRect | null>(null);
+  const [genre, setGenre] = useState("all");
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const gridRef = useRef<HTMLUListElement | null>(null);
-  useGridFlip(gridRef);
-
-  const genres = [...new Set(tracks.flatMap((t) => t.genres))];
-  // Multi-select: pick any combination of genres (Dance and Pop together, say).
-  // An empty set means "All". Toggling a pill adds or removes that genre. A
-  // track shows if it carries any of the selected genres.
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const genres = [...new Set(tracks.flatMap((track) => track.genres))];
   const shown =
-    selected.size === 0
+    genre === "all"
       ? tracks
-      : tracks.filter((t) => t.genres.some((g) => selected.has(g)));
-
-  const toggleGenre = (g: string) =>
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(g)) next.delete(g);
-      else next.add(g);
-      return next;
-    });
+      : tracks.filter((track) => track.genres.includes(genre));
+  const featureFirst = genre === "all";
 
   const open = (id: string, el: HTMLButtonElement) => {
     triggerRef.current = el;
@@ -87,42 +41,45 @@ export function WorkGrid({ tracks, className }: WorkGridProps) {
   return (
     <>
       {genres.length > 1 ? (
-        <div
-          role="group"
-          aria-label="Filter selected work by genre"
-          className="mb-[var(--space-7)] flex flex-wrap gap-[var(--space-2)]"
-        >
-          <GenrePill
-            label="All"
-            active={selected.size === 0}
-            onClick={() => setSelected(new Set())}
-          />
-          {genres.map((g) => (
-            <GenrePill
-              key={g}
-              label={g}
-              active={selected.has(g)}
-              onClick={() => toggleGenre(g)}
-            />
-          ))}
+        <div className="mb-[var(--space-6)] flex justify-end">
+          <label className="flex w-full items-center justify-between gap-3 border-b border-line pb-2 font-mono text-label uppercase tracking-[0.06em] text-muted sm:w-auto sm:min-w-[15rem]">
+            <span>Genre</span>
+            <select
+              value={genre}
+              onChange={(event) => setGenre(event.target.value)}
+              className="cursor-pointer bg-transparent text-right text-text outline-none"
+            >
+              <option value="all">All genres</option>
+              {genres.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       ) : null}
       <ul
-        ref={gridRef}
         className={cn(
-          "grid list-none gap-[var(--space-6)] p-0",
-          // auto-fill (not auto-fit) keeps cards a constant size: a lone card
-          // sits at one track width instead of stretching to fill the row.
-          "grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))]",
-          // Reserve roughly two card rows on larger screens so filtering down
-          // to a single row does not collapse the section and jump the page.
-          "md:min-h-[36rem]",
+          "grid list-none grid-cols-2 gap-x-3 gap-y-6 p-0 sm:grid-cols-3 sm:gap-5 lg:grid-cols-6",
           className,
         )}
       >
-        {shown.map((track) => (
-          <li key={track.id}>
-            <CardItem track={track} onOpen={open} />
+        {shown.map((track, index) => (
+          <li
+            key={track.id}
+            className={cn(
+              featureFirst && index === 0
+                ? "col-span-2 sm:col-span-3 lg:col-span-6"
+                : "lg:col-span-2",
+              featureFirst && index === 4 && "lg:col-start-2",
+            )}
+          >
+            <CardItem
+              track={track}
+              featured={featureFirst && index === 0}
+              onOpen={open}
+            />
           </li>
         ))}
       </ul>
@@ -137,9 +94,11 @@ export function WorkGrid({ tracks, className }: WorkGridProps) {
 // and return focus to it.
 function CardItem({
   track,
+  featured,
   onOpen,
 }: {
   track: Track;
+  featured: boolean;
   onOpen: (id: string, el: HTMLButtonElement) => void;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -147,6 +106,7 @@ function CardItem({
     <div ref={ref}>
       <AlbumCard
         track={track}
+        featured={featured}
         onOpen={() => {
           const btn = ref.current?.querySelector("button");
           if (btn) onOpen(track.id, btn);

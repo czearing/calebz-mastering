@@ -6,7 +6,8 @@ import { work } from "@/content";
 import { mockMatchMedia, mockDialog } from "@/components/work/testEnv";
 
 // Escape regex specials so titles like "Found You (CalebZ Remix)" match literally.
-const rx = (s: string) => new RegExp(s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+const rx = (s: string) =>
+  new RegExp(s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
 
 // The modal's A/B player loads via next/dynamic; stub it so opening a card does
 // not pull the audio engine into the section test.
@@ -53,16 +54,15 @@ describe("Work", () => {
     }
   });
 
-  it("keeps the cards bare: the track title appears only in the modal", async () => {
+  it("shows track identity on the card and full details in the modal", async () => {
     const user = userEvent.setup();
     render(<Work />);
     const first = work.tracks[0];
-    // Card is just the cover: no visible title text at rest. (Genre can appear
-    // in the genre filter pills, which is expected.)
-    expect(screen.queryByText(first.title)).not.toBeInTheDocument();
-    // Opening the modal reveals the metadata.
+    expect(screen.getByText(first.title)).toBeInTheDocument();
     await user.click(
-      screen.getByRole("button", { name: rx(`${first.title} by ${first.artist}`) }),
+      screen.getByRole("button", {
+        name: rx(`${first.title} by ${first.artist}`),
+      }),
     );
     const dialog = screen.getByRole("dialog", { name: first.title });
     expect(within(dialog).getByText(first.title)).toBeInTheDocument();
@@ -72,17 +72,16 @@ describe("Work", () => {
   it("filters the grid by genre", async () => {
     const user = userEvent.setup();
     render(<Work />);
-    // Tracks carry one or more genre tags, so the filter shows. Pick one genre
-    // and confirm only the cards carrying it remain.
     const genre = "Tropical House";
-    const matching = work.tracks.filter((t) => t.genres.includes(genre));
-    await user.click(screen.getByRole("button", { name: genre, pressed: false }));
+    const matching = work.tracks.filter((track) =>
+      track.genres.includes(genre),
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Genre" }),
+      genre,
+    );
     expect(
-      screen.getAllByRole("button", { name: /Open before and after/ }).length,
-    ).toBe(matching.length);
-    await user.click(screen.getByRole("button", { name: "All", pressed: false }));
-    expect(
-      screen.getAllByRole("button", { name: /Open before and after/ }).length,
-    ).toBe(work.tracks.length);
+      screen.getAllByRole("button", { name: /Open before and after/ }),
+    ).toHaveLength(matching.length);
   });
 });

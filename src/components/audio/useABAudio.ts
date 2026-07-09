@@ -39,8 +39,8 @@ export type UseABAudio = {
   readFrequency: (l: Uint8Array, r: Uint8Array) => boolean;
 };
 
-// One play head, two sources. Both elements are created lazily on first
-// play and kept at the same currentTime. Only the active side is audible;
+// One play head, two sources. Playback elements are created on first play
+// and kept at the same currentTime. Only the active side is audible;
 // the other is muted but playing in lockstep, so flipping the toggle is a
 // gapless switch at the identical position (plan/23). Each side carries a
 // level-match gain so the only audible change is the master, never volume.
@@ -59,6 +59,24 @@ export function useABAudio(
   const [side, setSideState] = useState<ABSide>("before");
   const sideRef = useRef<ABSide>("before");
   const graphRef = useRef<Graph | null>(null);
+
+  useEffect(() => {
+    setDuration(0);
+    const probe = new Audio();
+    probe.preload = "metadata";
+    const update = () => {
+      if (Number.isFinite(probe.duration)) setDuration(probe.duration);
+    };
+    probe.addEventListener("loadedmetadata", update);
+    probe.addEventListener("durationchange", update);
+    probe.src = beforeSrc;
+    update();
+    return () => {
+      probe.removeEventListener("loadedmetadata", update);
+      probe.removeEventListener("durationchange", update);
+      probe.removeAttribute("src");
+    };
+  }, [beforeSrc]);
 
   // Build the analyser graph once, on first play (a user gesture, so the
   // AudioContext is allowed to start). Both sources feed one channel splitter;

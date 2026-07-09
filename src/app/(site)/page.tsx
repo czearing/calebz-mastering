@@ -11,7 +11,6 @@ import {
   Testimonials,
   Contact,
   Footer,
-  MobileBookBar,
 } from "@/components/sections";
 
 // The home page: one scroll, one master pass (plan/07, plan/23). Server
@@ -27,13 +26,10 @@ import {
 // re-render per frame. With smooth scroll disabled the same read still reflects
 // native scroll, so the morph works either way.
 export default function HomePage() {
-  // With commerce off (launch default) there is no cart, so the persistent
-  // mobile CTA points at the contact section and the testimonials grid stays
-  // dark until real quotes exist.
+  // With commerce off, the header action points to contact.
   const book = flags.commerce
     ? nav.book
     : { ...nav.book, label: "Get in touch", href: "#contact" };
-  const bookWatchIds = flags.commerce ? ["services", "contact"] : ["contact"];
   // With the Services section dark at launch, drop its nav link so nothing
   // points at a section that isn't rendered.
   const links = flags.commerce
@@ -55,7 +51,6 @@ export default function HomePage() {
         <Contact />
       </main>
       <Footer />
-      <MobileBookBar book={book} watchIds={bookWatchIds} />
     </ScrollProvider>
   );
 }
