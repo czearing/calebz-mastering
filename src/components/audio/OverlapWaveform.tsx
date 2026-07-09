@@ -108,7 +108,7 @@ export function OverlapWaveform({
       <svg
         viewBox={`0 0 ${W} ${H}`}
         preserveAspectRatio="none"
-        className="h-44 w-full md:h-56"
+        className="h-[clamp(60px,22dvh,240px)] w-full"
         aria-hidden="true"
       >
         <path

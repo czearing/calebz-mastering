@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button, Tag } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { ABPlayerLazy } from "@/components/audio/ABPlayerLazy";
+import { PlatformIcon, platformLabel } from "./PlatformIcon";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { toAudioSource, type Track } from "@/content";
 
@@ -100,8 +101,32 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
         "border border-line bg-surface p-0 text-text backdrop:bg-bg/45",
       )}
     >
-      <div className="relative aspect-[2.6] max-h-[30dvh] w-full shrink-0">
+      <div className="relative aspect-[2.6] max-h-[22dvh] w-full shrink-0">
         <Image src={track.cover} alt="" fill sizes="640px" className="object-cover" />
+
+        {/* "Listen on" links: transparent icon buttons stacked on the cover's
+            left, so a listener can open the full track on its platform. */}
+        {track.links && track.links.length > 0 ? (
+          <div className="absolute left-[var(--space-3)] top-[var(--space-3)] flex flex-col gap-[var(--space-2)]">
+            {track.links.map((link) => (
+              <a
+                key={link.platform}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Listen on ${platformLabel(link.platform)}`}
+                className={cn(
+                  "flex h-9 w-9 items-center justify-center rounded-full",
+                  "bg-bg/45 text-text backdrop-blur-sm transition-colors",
+                  "hover:bg-bg/70 hover:text-cyan focus-visible:text-cyan",
+                )}
+              >
+                <PlatformIcon platform={link.platform} className="h-[18px] w-[18px]" />
+              </a>
+            ))}
+          </div>
+        ) : null}
+
         <Button
           variant="ghost"
           onClick={requestClose}
@@ -112,9 +137,12 @@ export function TrackModal({ track, open, triggerRect, onClose }: TrackModalProp
         </Button>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-[var(--space-4)] overflow-y-auto overscroll-contain p-[var(--space-4)] sm:gap-[var(--space-5)] sm:p-[var(--space-5)]">
+      <div className="flex min-h-0 flex-1 flex-col gap-[clamp(0.5rem,1.7dvh,1.25rem)] overflow-y-auto overscroll-contain p-[clamp(0.7rem,2dvh,1.25rem)]">
         <header className="flex flex-col gap-[var(--space-2)]">
-          <h2 id={titleId} className="text-h2 font-sans text-text">
+          <h2
+            id={titleId}
+            className="text-[clamp(1.1rem,3.2dvh,2.75rem)] font-sans leading-[1.1] text-text"
+          >
             {track.title}
           </h2>
           <span className="flex flex-wrap items-center gap-[var(--space-3)]">

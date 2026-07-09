@@ -175,10 +175,9 @@ export function RadialSpectrum({ playing }: { playing: boolean }) {
     <div
       aria-hidden="true"
       className={cn(
-        "pointer-events-none absolute z-0 transition-opacity duration-500 ease-out",
+        "pointer-events-none fixed inset-0 z-0 transition-opacity duration-500 ease-out",
         playing ? "opacity-100" : "opacity-0",
       )}
-      style={{ inset: `-${MARGIN}px` }}
     >
       <canvas ref={canvasRef} className="block h-full w-full" />
     </div>

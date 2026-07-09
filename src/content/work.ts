@@ -18,6 +18,7 @@ export const work: Work = {
       genres: ["Dance", "Tropical House"],
       cover: "/work/found-you-calebz-remix.jpg",
       audio: workAudio["found-you"],
+      links: [{ platform: "soundcloud", url: "https://soundcloud.com/caleb_z/found-you-calebz-remix" }],
     },
     {
       id: "bad-dream",
@@ -26,6 +27,7 @@ export const work: Work = {
       genres: ["Dubstep", "Trap"],
       cover: "/work/bad-dream.jpg",
       audio: workAudio["bad-dream"],
+      links: [{ platform: "soundcloud", url: "https://soundcloud.com/caleb_z/bad-dream-calebz-remix" }],
     },
     {
       id: "hollywood-perfect",
@@ -34,6 +36,7 @@ export const work: Work = {
       genres: ["Trap", "Hip-Hop"],
       cover: "/work/hollywood-perfect.jpg",
       audio: workAudio["hollywood-perfect"],
+      links: [{ platform: "soundcloud", url: "https://soundcloud.com/caleb_z/hollywood-perfect-calebz-remix" }],
     },
     {
       id: "forest",
@@ -42,6 +45,7 @@ export const work: Work = {
       genres: ["Progressive House", "EDM"],
       cover: "/work/forest.jpg",
       audio: workAudio["forest"],
+      links: [{ platform: "soundcloud", url: "https://soundcloud.com/caleb_z/forest" }],
     },
     {
       id: "tell-me-im-pretty",
@@ -50,6 +54,7 @@ export const work: Work = {
       genres: ["Pop", "Bass House"],
       cover: "/work/tell-me-im-pretty.jpg",
       audio: workAudio["tell-me-im-pretty"],
+      links: [{ platform: "soundcloud", url: "https://soundcloud.com/caleb_z/tell-me-im-pretty-icona-pop-version-calebz-remix" }],
     },
     {
       id: "down",

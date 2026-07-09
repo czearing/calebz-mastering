@@ -52,6 +52,13 @@ export type Services = {
   formats: string;
 };
 
+// A streaming-platform destination for a track, shown as an icon button on the
+// modal cover so a listener can open the full track where it lives.
+export type TrackLink = {
+  platform: "soundcloud" | "spotify" | "apple" | "youtube";
+  url: string;
+};
+
 export type Track = {
   id: string;
   title: string;
@@ -63,6 +70,8 @@ export type Track = {
   cover: string;
   // The per-track A/B sources: raw mix and finished master (plan/07, plan/23).
   audio: AudioPair;
+  // Optional "listen on" links, rendered as icon buttons on the modal cover.
+  links?: TrackLink[];
 };
 
 export type Work = {

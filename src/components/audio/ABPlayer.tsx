@@ -116,7 +116,7 @@ export function ABPlayer({
           outside its box, so it never covers the controls. */}
       <RadialSpectrum playing={playing} />
 
-      <div className="relative z-10 flex flex-col gap-5 p-5">
+      <div className="relative z-10 flex flex-col gap-[clamp(0.5rem,1.7dvh,1.25rem)] p-[clamp(0.7rem,2dvh,1.25rem)]">
         <header className="flex items-center justify-between gap-3">
           <PlayButton ref={playRef} playing={playing} onClick={toggle} label={playLabel} />
           <ABToggle side={side} onChange={setSide} />
