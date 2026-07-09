@@ -18,6 +18,7 @@ const vertex = /* glsl */ `
   uniform float uProgress;
   uniform float uTime;
   uniform vec2 uPointer;
+  uniform float uPhase;
   varying float vHeight;
   varying vec2 vUv;
 
@@ -28,10 +29,11 @@ const vertex = /* glsl */ `
     float amount = mix(0.45, 1.0, uProgress);
     // A slow breathing drift, scaled down hard in the before state so the raw
     // mix reads unsettled but never busy.
-    float drift = sin(uv.x * 12.0 + uTime * 0.4) * 0.04 * (1.0 - uProgress);
+    float drift = sin(uv.x * 12.0 + uTime * 0.32 + uPhase) * 0.035 * (1.0 - uProgress);
     // Pointer nudges the nearest ridge, a quiet parallax, never a burst.
     float reach = 1.0 - smoothstep(0.0, 0.5, distance(uv, uPointer * 0.5 + 0.5));
-    float lift = (h + drift) * amount + reach * 0.06;
+    float ripple = sin(distance(uv, uPointer * 0.5 + 0.5) * 28.0 - uTime * 1.1 + uPhase);
+    float lift = (h + drift) * amount + reach * (0.055 + ripple * 0.018);
     vHeight = lift;
     vec3 pos = position;
     pos.z += lift;
@@ -42,6 +44,9 @@ const vertex = /* glsl */ `
 const fragment = /* glsl */ `
   uniform vec3 uColor;
   uniform float uProgress;
+  uniform float uTime;
+  uniform float uPhase;
+  uniform float uOpacity;
   varying float vHeight;
   varying vec2 vUv;
 
@@ -55,14 +60,19 @@ const fragment = /* glsl */ `
     float ink = 1.0 - smoothstep(0.0, 0.22, line);
     float halo = (1.0 - smoothstep(0.0, 0.6, line)) * 0.35;
     float mark = clamp(ink + halo, 0.0, 1.0);
+    float gridX = 1.0 - smoothstep(0.0, 0.06, abs(fract(vUv.x * 18.0) - 0.5));
+    float gridY = 1.0 - smoothstep(0.0, 0.08, abs(fract(vUv.y * 12.0) - 0.5));
+    float grid = max(gridX, gridY) * 0.08;
+    float scan = 1.0 - smoothstep(0.0, 0.035, abs(vUv.x - fract(uTime * 0.035 + uPhase)));
     // BEFORE leans a bright readable grey, AFTER leans full cyan.
     vec3 grey = vec3(0.52, 0.58, 0.62);
     vec3 tint = mix(grey, uColor, uProgress);
     // Fade the far edge so the plane dissolves into the near-black bg.
-    float depth = smoothstep(0.0, 0.3, vUv.y);
+    float depth = smoothstep(0.0, 0.28, vUv.y) * (1.0 - smoothstep(0.88, 1.0, vUv.y));
+    float sides = smoothstep(0.0, 0.09, vUv.x) * (1.0 - smoothstep(0.91, 1.0, vUv.x));
     // High floor so the terrain is clearly visible at progress 0, climbing to
     // near-opaque cyan at progress 1.
-    float alpha = mark * mix(0.7, 1.0, uProgress) * depth;
+    float alpha = (mark + grid + scan * 0.12) * mix(0.7, 1.0, uProgress) * depth * sides * uOpacity;
     gl_FragColor = vec4(tint, alpha);
   }
 `;
@@ -73,6 +83,8 @@ const MotifShaderMaterial = shaderMaterial(
     uProgress: 0,
     uTime: 0,
     uPointer: [0, 0],
+    uPhase: 0,
+    uOpacity: 1,
     uColor: new Color(colorHex.cyan),
   },
   vertex,
@@ -89,13 +101,15 @@ declare module "@react-three/fiber" {
 
 export type MotifMaterialProps = {
   terrain: Texture | null;
+  opacity?: number;
+  phase?: number;
 };
 
 // Thin typed wrapper. Only the static uTerrain/uColor uniforms are set as React
 // props; the per-frame uProgress/uTime/uPointer are written imperatively
 // through the forwarded ref inside useFrame, so scroll never re-renders React.
 export const MotifMaterial = forwardRef<ShaderMaterial, MotifMaterialProps>(
-  function MotifMaterial({ terrain }, ref) {
+  function MotifMaterial({ terrain, opacity = 1, phase = 0 }, ref) {
     const color = new Color(colorHex.cyan);
     return (
       <motifShaderMaterial
@@ -103,6 +117,8 @@ export const MotifMaterial = forwardRef<ShaderMaterial, MotifMaterialProps>(
         key={MotifShaderMaterial.key}
         uTerrain={terrain}
         uColor={color}
+        uOpacity={opacity}
+        uPhase={phase}
         transparent
         depthWrite={false}
       />

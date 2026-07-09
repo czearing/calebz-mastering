@@ -4,9 +4,10 @@ import { render, screen } from "@testing-library/react";
 // next/dynamic pulls in the R3F canvas chunk. The motif is decorative and the
 // page must read without it, so stub the dynamic loader to render nothing here.
 vi.mock("next/dynamic", () => ({
-  default: () => function MockMotif() {
-    return null;
-  },
+  default: () =>
+    function MockMotif() {
+      return null;
+    },
 }));
 
 import { Hero } from "./Hero";
@@ -52,10 +53,10 @@ describe("Hero", () => {
     ).toBeInTheDocument();
   });
 
-  it("offers one primary action that anchors to the services console", () => {
+  it("offers one primary action that anchors to selected work", () => {
     render(<Hero />);
     const cta = screen.getByRole("link", { name: hero.primaryAction });
-    expect(cta).toHaveAttribute("href", "#services");
+    expect(cta).toHaveAttribute("href", "#work");
   });
 
   it("no longer carries the founder note; it moved to the About section", () => {
@@ -69,7 +70,8 @@ describe("Hero", () => {
     render(<Hero />);
     // "Hear the difference." is the H1 only; the before/after proof now lives in
     // the Work section, so the hero never repeats the line.
-    const titles = screen.getAllByText(hero.headline);
-    expect(titles.length).toBe(1);
+    expect(
+      screen.getByRole("heading", { level: 1, name: hero.headline }),
+    ).toBeInTheDocument();
   });
 });

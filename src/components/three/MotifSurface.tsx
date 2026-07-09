@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import type { ShaderMaterial } from "three";
+import { MathUtils, type Group, type ShaderMaterial } from "three";
 import { MotifMaterial } from "./MotifMaterial";
 import { generateTerrain } from "./terrainData";
 import { readProgress } from "./scrollProgress";
@@ -28,7 +28,9 @@ const EPS = 0.001;
 // frameloop whenever progress or pointer moves so the morph keeps advancing.
 export function MotifSurface({ animate, active, onReady }: MotifSurfaceProps) {
   const terrain = generateTerrain();
-  const material = useRef<ShaderMaterial>(null);
+  const group = useRef<Group>(null);
+  const primary = useRef<ShaderMaterial>(null);
+  const echo = useRef<ShaderMaterial>(null);
   const progress = useRef(readProgress());
   const pointer = useRef<[number, number]>([0, 0]);
   const time = useRef(0);
@@ -53,10 +55,6 @@ export function MotifSurface({ animate, active, onReady }: MotifSurfaceProps) {
   }, [invalidate, active]);
 
   useFrame((state, delta) => {
-    const mat = material.current;
-    if (!mat) return;
-    const u = mat.uniforms;
-
     const nextProgress = readProgress();
     const px = state.pointer.x;
     const py = state.pointer.y;
@@ -67,17 +65,45 @@ export function MotifSurface({ animate, active, onReady }: MotifSurfaceProps) {
 
     progress.current = nextProgress;
     pointer.current = [px, py];
-    u.uProgress.value = nextProgress;
-    u.uPointer.value = pointer.current;
+    for (const mat of [primary.current, echo.current]) {
+      if (!mat) continue;
+      mat.uniforms.uProgress.value = nextProgress;
+      mat.uniforms.uPointer.value = pointer.current;
+    }
 
     if (animate) {
       time.current += delta;
-      u.uTime.value = time.current;
+      for (const mat of [primary.current, echo.current]) {
+        if (mat) mat.uniforms.uTime.value = time.current;
+      }
       invalidate();
     } else if (moved) {
       // Pointer/scroll moved but the idle loop is off: keep the morph alive.
       invalidate();
     }
+
+    const g = group.current;
+    if (g) {
+      g.rotation.z = MathUtils.lerp(g.rotation.z, px * 0.025, 0.045);
+      g.position.x = MathUtils.lerp(g.position.x, px * 0.08, 0.04);
+      g.position.y = MathUtils.lerp(g.position.y, -0.32 + py * 0.035, 0.04);
+    }
+    state.camera.position.x = MathUtils.lerp(
+      state.camera.position.x,
+      px * 0.11,
+      0.035,
+    );
+    state.camera.position.y = MathUtils.lerp(
+      state.camera.position.y,
+      0.5 + py * 0.05 + nextProgress * 0.08,
+      0.035,
+    );
+    state.camera.position.z = MathUtils.lerp(
+      state.camera.position.z,
+      2.35 - nextProgress * 0.18,
+      0.035,
+    );
+    state.camera.lookAt(0, 0, 0);
 
     if (!painted.current) {
       painted.current = true;
@@ -86,9 +112,20 @@ export function MotifSurface({ animate, active, onReady }: MotifSurfaceProps) {
   });
 
   return (
-    <mesh rotation={[-Math.PI / 2.6, 0, 0]} position={[0, -0.2, 0]}>
-      <planeGeometry args={[4, 4, 128, 128]} />
-      <MotifMaterial ref={material} terrain={terrain} />
-    </mesh>
+    <group ref={group} rotation={[-Math.PI / 2.55, 0, 0]}>
+      <mesh position={[0, 0, 0]}>
+        <planeGeometry args={[4.6, 4.6, 128, 128]} />
+        <MotifMaterial ref={primary} terrain={terrain} />
+      </mesh>
+      <mesh position={[0, 0, -0.16]} scale={1.06}>
+        <planeGeometry args={[4.6, 4.6, 96, 96]} />
+        <MotifMaterial
+          ref={echo}
+          terrain={terrain}
+          opacity={0.18}
+          phase={1.7}
+        />
+      </mesh>
+    </group>
   );
 }

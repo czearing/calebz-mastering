@@ -86,7 +86,7 @@ export function MotifCanvas({ className }: MotifCanvasProps) {
           dpr={cappedDpr()}
           frameloop={frameloop}
           gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
-          camera={{ position: [0, 0.6, 2.4], fov: 50 }}
+          camera={{ position: [0, 0.5, 2.35], fov: 52 }}
         >
           <Suspense fallback={null}>
             <MotifSurface animate={animate} active={active} onReady={onReady} />
