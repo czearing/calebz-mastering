@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { track as trackEvent } from "@vercel/analytics";
 import { cn } from "@/lib/cn";
 import type { Track } from "@/content";
 import { AlbumCard } from "./AlbumCard";
@@ -25,6 +26,7 @@ export function WorkGrid({ tracks, className }: WorkGridProps) {
   const featureFirst = genre === "all";
 
   const open = (id: string, el: HTMLButtonElement) => {
+    trackEvent("Track Open", { track: id });
     triggerRef.current = el;
     setRect(el.getBoundingClientRect());
     setOpenId(id);
@@ -46,7 +48,11 @@ export function WorkGrid({ tracks, className }: WorkGridProps) {
             <span>Genre</span>
             <select
               value={genre}
-              onChange={(event) => setGenre(event.target.value)}
+              onChange={(event) => {
+                const next = event.target.value;
+                trackEvent("Genre Filter", { genre: next });
+                setGenre(next);
+              }}
               className="cursor-pointer bg-transparent text-right text-text outline-none"
             >
               <option value="all">All genres</option>

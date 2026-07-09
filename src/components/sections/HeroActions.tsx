@@ -1,3 +1,6 @@
+"use client";
+
+import { track } from "@vercel/analytics";
 import { cn } from "@/lib/cn";
 
 export type HeroActionsProps = {
@@ -19,7 +22,11 @@ export function HeroActions({
   servicesHref = "#work",
 }: HeroActionsProps) {
   return (
-    <a href={servicesHref} className={cn(cta)}>
+    <a
+      href={servicesHref}
+      className={cn(cta)}
+      onClick={() => track("Work CTA Click")}
+    >
       {primaryAction}
     </a>
   );

@@ -1,6 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { HeroActions } from "./HeroActions";
+
+const { track } = vi.hoisted(() => ({ track: vi.fn() }));
+vi.mock("@vercel/analytics", () => ({ track }));
 
 describe("HeroActions", () => {
   it("renders the primary action as a real link to selected work", () => {
@@ -16,5 +20,11 @@ describe("HeroActions", () => {
     expect(
       screen.getByRole("link", { name: "Start a master" }),
     ).toHaveAttribute("href", "/#services");
+  });
+
+  it("tracks the work action", async () => {
+    render(<HeroActions primaryAction="Hear the work" />);
+    await userEvent.click(screen.getByRole("link", { name: "Hear the work" }));
+    expect(track).toHaveBeenCalledWith("Work CTA Click");
   });
 });
