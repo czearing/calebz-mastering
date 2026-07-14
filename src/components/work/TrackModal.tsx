@@ -7,7 +7,6 @@ import { Button, Tag } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { ABPlayerLazy } from "@/components/audio/ABPlayerLazy";
 import { PlatformIcon, platformLabel } from "./PlatformIcon";
-import { CaseStudyFacts } from "./CaseStudyFacts";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { toAudioSource, type Track } from "@/content";
 
@@ -180,8 +179,6 @@ export function TrackModal({
             ))}
           </span>
         </header>
-
-        {track.caseStudy ? <CaseStudyFacts study={track.caseStudy} /> : null}
 
         <ABPlayerLazy
           before={toAudioSource(track.audio.before)}

@@ -68,11 +68,14 @@ describe("TrackModal", () => {
     expect(screen.getByTestId("ab-player")).toBeInTheDocument();
   });
 
-  it("shows the case note and platform link", () => {
+  it("hides internal case notes and shows the platform link", () => {
     render(
       <TrackModal track={track} open triggerRect={null} onClose={() => {}} />,
     );
-    expect(screen.getByText("The mix lacked density.")).toBeInTheDocument();
+    expect(screen.queryByText("Issue")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("The mix lacked density."),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Listen on SoundCloud" }),
     ).toHaveAttribute("href", "https://soundcloud.com/example/first-light");
